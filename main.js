@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .then((data) => {
       gridOptions.api.setRowData(data);
       autoSizeAll();
+      gridOptions.api.closeToolPanel();
     });
 });
 
