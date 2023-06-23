@@ -12,10 +12,15 @@ $db_name = "reseller_experience";
 $conn = new mysqli($servername, $db_username, $db_password, $db_name);
 
 // Vérification des informations d'identification
-$query = "SELECT * FROM utilisateurs WHERE username='$username' AND password='$password'";
+$query = "SELECT * FROM utilisateurs WHERE username='$username'";
 $result = $conn->query($query);
 
 if ($result->num_rows == 1) {
+  $row = $result->fetch_assoc();
+  $hashedPasswordFromDB = $row['password'];
+
+  // Vérifier si le mot de passe fourni correspond au hachage stocké
+  if (password_verify($password, $hashedPasswordFromDB)) {
     // Authentification réussie
     session_start();
     $_SESSION['authenticated'] = true;
@@ -24,3 +29,10 @@ if ($result->num_rows == 1) {
     // Authentification échouée
     http_response_code(401); // Unauthorized
   }
+} else {
+  // Authentification échouée
+  http_response_code(401); // Unauthorized
+}
+
+$conn->close();
+?>

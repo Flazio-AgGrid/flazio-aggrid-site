@@ -1,4 +1,14 @@
 <?php
+
+session_start();
+
+// Vérifier si l'utilisateur est authentifié
+if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
+    // Rediriger vers une page d'erreur ou afficher un message d'erreur
+    header('Location: erreur.php');
+    exit;
+}
+
 // Établir une connexion à MySQL et exécuter une requête
 $mysqli = new mysqli("localhost", "root", "", "reseller_experience");
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Authentification</title>
   <script>
@@ -15,21 +16,22 @@
         },
         body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
       })
-      .then(function(response) {
-        if (response.ok) {
-          // Rediriger vers index.php
-          window.location.href = 'index.php';
-        } else {
-          // Afficher le message d'erreur
-          alert('Authentification échouée');
-        }
-      })
-      .catch(function(error) {
-        console.error('Erreur :', error);
-      });
+        .then(function (response) {
+          if (response.ok) {
+            // Rediriger vers index.php
+            window.location.href = 'index.php';
+          } else {
+            // Afficher le message d'erreur
+            alert('Authentification échouée');
+          }
+        })
+        .catch(function (error) {
+          console.error('Erreur :', error);
+        });
     }
   </script>
 </head>
+
 <body>
   <h2>Authentification</h2>
   <form>
@@ -42,4 +44,5 @@
     <input type="button" value="Se connecter" onclick="authenticate()">
   </form>
 </body>
+
 </html>
