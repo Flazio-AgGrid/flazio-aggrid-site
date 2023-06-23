@@ -35,8 +35,6 @@ while ($row = $result->fetch_assoc()) {
 $jsonData = json_encode($data);
 
 // Enregistrer le JSON dans un fichier
-// $file = 'data.json';
-// file_put_contents($file, $jsonData);
 echo $jsonData;
 //echo "Les données ont été transférées vers un fichier JSON avec succès.";
 
