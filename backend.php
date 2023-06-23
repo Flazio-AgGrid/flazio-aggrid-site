@@ -1,8 +1,8 @@
 <?php
-// Établir une connexion à MySQL et exécuter une requête
+// Établir une connexion à MySQL et exécuter une requête 
 $mysqli = new mysqli("localhost", "root", "", "reseller_experience");
 
-// Vérifier si la connexion a échoué
+// Vérifier si la connexion a échoué 
 if ($mysqli->connect_errno) {
     echo "Échec de la connexion MySQL : " . $mysqli->connect_error;
     exit();
@@ -42,4 +42,3 @@ echo $jsonData;
 
 // Fermer la connexion à la base de données
 $mysqli->close();
-?>
