@@ -91,15 +91,33 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response = array("id" => $id, "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
     }
     else {
-        // Insert the record with default data if it doesn't exist
-        $default_jsondata = json_encode(['formatted_address' => 'DEFAULT_STREET , 1234567, DEFAULT_DISTRICT, Italy', 'formatted_phone_number' => '123 xxx 6789', 'name' => 'Example', 'website' => 'http://www.example.it/']);
-        $insertSql        = "INSERT INTO maps_info (fk_lead, id_cat, jsondata, website, warning, id_cat_automatica) VALUES (?, ?, ?, 'default_website', 'default_warning', 'default_id_cat_automatica')";
-        $stmt             = $mysqli->prepare($insertSql);
-        $stmt->bind_param("iis", $id, $id_cat, $default_jsondata);
-        $stmt->execute();
-        $stmt->close();
+        $query           = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
+        $result          = $mysqli->query($query);
+        $tableau_adresse = $result->fetch_all();
 
-        $response = array("id" => $id, "message" => "Enregistrement créé avec succès pour l'ID : " . $id);
+        // Générer et insérer les données dans la table
+        foreach ($tableau_adresse as $row) {
+            $fk_lead           = $row[0];
+            $jsondata          = json_encode(
+                array(
+                    "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
+                    "formatted_phone_number" => "123 xxx 6789",
+                    "name"                   => "Example",
+                    "website"                => "http://www.example.it/"
+                )
+            );
+            $website           = "example.it";
+            $warning           = rand(0, 1);
+            $id_cat            = null;
+            $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
+
+            $query = "INSERT INTO maps_info (fk_lead, jsondata, website, warning, id_cat, id_cat_automatica) VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $mysqli->prepare($query);
+            $stmt->bind_param("isssii", $fk_lead, $jsondata, $website, $warning, $id_cat, $id_cat_automatica);
+            $stmt->execute();
+        }
+
+        $stmt->close();
     }
 
     echo json_encode($response);
