@@ -22,14 +22,14 @@ const gridOptions = {
     { field: "reseller_experience_manager_id" },
     { field: "CAOName" },
     {
-      field: "id_cat",
+      field: "title_cat",
       headerName: "Category choice",
       pinned: "right",
       editable: true,
       cellEditor: "agRichSelectCellEditor",
       cellEditorPopup: true,
       cellEditorParams: {
-        values: categoryValues(),
+        values: [],
       },
     },
   ],
@@ -43,6 +43,8 @@ const gridOptions = {
   },
   sideBar: true,
 };
+var category = {};
+list_modified_row = [];
 
 document.addEventListener("DOMContentLoaded", function () {
   var gridDiv = document.querySelector("#myGrid");
@@ -51,8 +53,16 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("backend.php")
     .then((response) => response.json())
     .then((data) => {
+      let cat_tab = [];
+      data.category.map((el) => {
+        cat_tab.push(el.title);
+      });
+      gridOptions.columnDefs.find(
+        (colDef) => colDef.field === "title_cat"
+      ).cellEditorParams.values = cat_tab;
+      category = data.category;
       setCategory(data);
-      gridOptions.api.setRowData(data);
+      gridOptions.api.setRowData(data.data);
       autoSizeAll();
       gridOptions.api.closeToolPanel();
     });
@@ -60,11 +70,47 @@ document.addEventListener("DOMContentLoaded", function () {
   // Ajouter un gestionnaire d'événements pour écouter les modifications de cellule
   gridOptions.api.addEventListener("cellValueChanged", function (event) {
     // Récupérer les données modifiées
-    var modifiedData = [event.data];
-    // Envoyer les données modifiées au backend pour enregistrement
-    saveChangesToBackend(modifiedData);
+    const modifiedData = reassignationIdCat(event.data);
+    const existingRow = list_modified_row.find(
+      (row) => row.id === modifiedData.id
+    );
+    if (existingRow) {
+      Object.assign(existingRow, modifiedData);
+    } else {
+      list_modified_row.push(modifiedData);
+    }
+    if (list_modified_row.length === 1) {
+      createSaveButton();
+    }
+    console.log(list_modified_row);
   });
 });
+
+function reassignationIdCat(rowModified) {
+  const newIdCat = category.find((el) => el.title === rowModified.title_cat);
+  rowModified.id_cat = newIdCat.id;
+  return rowModified;
+}
+
+function createSaveButton() {
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Save Changes";
+  saveButton.style.position = "fixed";
+  saveButton.style.bottom = "20px";
+  saveButton.style.right = "20px";
+  saveButton.style.padding = "10px";
+  saveButton.style.backgroundColor = "#007bff";
+  saveButton.style.color = "#fff";
+  saveButton.style.border = "none";
+  saveButton.style.borderRadius = "5px";
+  saveButton.style.cursor = "pointer";
+
+  saveButton.addEventListener("click", function () {
+    saveChangesToBackend();
+  });
+
+  document.body.appendChild(saveButton);
+}
 
 function autoSizeAll(skipHeader) {
   const allColumnIds = [];
@@ -75,68 +121,45 @@ function autoSizeAll(skipHeader) {
   gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
 }
 
-function categoryValues() {
-  const category = [
-    "2 - Personal website or Freelancer",
-    "130 - Business",
-    "137 - Blog",
-    "125 - Services",
-    "44 - Booking",
-    "68 - Restaurant",
-    "8 - Design ",
-    "66 - Advertising",
-    "1 - Real Estate",
-    "37 - Health and Beatuy",
-    "78 - Portfolio",
-  ];
-
-  return category;
-}
-
 function setCategory(data) {
-  const category = categoryValues();
-  const data_tmp = data;
-  data_tmp.map((el) => {
-    console.log(el.id_cat_automatica, el.id_cat);
+  const categories = data.category;
+  const data_tmp = data.data;
+
+  data_tmp.forEach((el) => {
     if (el.id_cat_automatica !== null) {
-      el.id_cat = category[el.id_cat_automatica];
+      el.id_cat = categories[el.id_cat_automatica];
     } else if (el.id_cat !== null) {
-      el.id_cat = category[el.id_cat];
+      el.id_cat = categories[el.id_cat];
     }
   });
 }
 
-function saveChangesToBackend(data) {
-  // Envoyer les données modifiées au backend pour enregistrement
-  // Utilisez ici votre logique d'enregistrement des modifications
-  var category = categoryValues();
-  var data_tmp = data;
-  category.map((el) => {
-    if (el === data_tmp[0].id_cat) {
-      data_tmp[0].id_cat = category.indexOf(el);
-    }
-  });
-  console.log("Données modifiées :", data_tmp);
-  fetch("backend.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ modifiedData: data_tmp }),
-  })
-    .then((response) => response.text())
-    .then((result) => {
-      console.log(result); // Afficher la réponse du backend
-      body = document.querySelector("body");
-      out = document.createElement("div");
-      out.innerHTML = result;
-      body.appendChild(out);
+function saveChangesToBackend() {
+  var data_tmp = list_modified_row;
+  for (let i in data_tmp) {
+    const modifiedData = data_tmp[i];
+    console.log("Données modifiées :", modifiedData);
+    fetch("backend.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ modifiedData: modifiedData }),
     })
-    .catch((error) => {
-      console.error("Erreur lors de l'envoi des données au backend:", error);
-      body = document.querySelector("body");
-      out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
-    });
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result); // Afficher la réponse du backend
+        const body = document.querySelector("body");
+        const out = document.createElement("div");
+        out.innerHTML = result;
+        body.appendChild(out);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'envoi des données au backend:", error);
+        const body = document.querySelector("body");
+        const out = document.createElement("div");
+        out.innerHTML = error;
+        body.appendChild(out);
+      });
+  }
 }
