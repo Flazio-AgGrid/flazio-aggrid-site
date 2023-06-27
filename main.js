@@ -68,6 +68,9 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch((error) => {
       console.error("Erreur lors de la récupération des données:", error);
+      createNotification(
+        `Erreur lors de l'envoi des données au backend: ${error}`
+      );
       const body = document.querySelector("body");
       const out = document.createElement("div");
       out.innerHTML = error;
@@ -147,7 +150,7 @@ function saveChangesToBackend() {
   var data_tmp = list_modified_row;
   for (let i in data_tmp) {
     const modifiedData = data_tmp[i];
-    console.log("Données modifiées :", modifiedData);
+    console.log("Données modifiées :", modifiedData.id);
     fetch("backend.php", {
       method: "POST",
       headers: {
@@ -155,16 +158,65 @@ function saveChangesToBackend() {
       },
       body: JSON.stringify({ modifiedData: modifiedData }),
     })
-      .then((response) => response.text())
+      .then((response) => response.json())
       .then((result) => {
-        console.log(result); // Afficher la réponse du backend
+        console.log(result.status); // Afficher la réponse du backend
+        createNotification(result.message);
+        list_modified_row = [];
       })
       .catch((error) => {
         console.error("Erreur lors de l'envoi des données au backend:", error);
+        createNotification(
+          `Erreur lors de l'envoi des données au backend: ${error}`
+        );
         const body = document.querySelector("body");
         const out = document.createElement("div");
         out.innerHTML = error;
         body.appendChild(out);
       });
   }
+}
+
+function createNotification(text) {
+  var notificationsContainer = document.getElementById(
+    "notifications-container"
+  );
+  if (!notificationsContainer) {
+    notificationsContainer = document.createElement("div");
+    notificationsContainer.id = "notifications-container";
+    notificationsContainer.style.display = "flex";
+    notificationsContainer.style.flexDirection = "column";
+    notificationsContainer.style.position = "fixed";
+    notificationsContainer.style.bottom = "20px";
+    notificationsContainer.style.right = "20px";
+    document.body.appendChild(notificationsContainer);
+  }
+  const notification = document.createElement("div");
+  notification.textContent = text;
+
+  notification.style.padding = "10px";
+  notification.style.backgroundColor = "#007bff";
+  notification.style.color = "#fff";
+  notification.style.borderRadius = "5px";
+  notification.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
+  notification.style.cursor = "pointer";
+  notification.style.opacity = "0";
+  notification.style.transition = "opacity 0.4s ease";
+  notification.style.marginBottom = "5px";
+
+  notificationsContainer.insertBefore(
+    notification,
+    notificationsContainer.firstChild
+  );
+
+  setTimeout(function () {
+    notification.style.opacity = "1";
+  }, 100);
+
+  setTimeout(function () {
+    notification.style.opacity = "0";
+    setTimeout(function () {
+      notification.parentNode.removeChild(notification);
+    }, 300);
+  }, 3000);
 }

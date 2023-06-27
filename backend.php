@@ -88,7 +88,7 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
         $stmt->close();
 
-        $response = array("id" => $id, "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
+        $response = array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
     }
     else {
         $query           = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
@@ -118,7 +118,7 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $stmt->close();
-        $response = array("id" => $id, "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
+        $response = array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
     }
 
     echo json_encode($response);
