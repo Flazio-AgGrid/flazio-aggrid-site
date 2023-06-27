@@ -112,12 +112,13 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
 
             $query = "INSERT INTO maps_info (fk_lead, jsondata, website, warning, id_cat, id_cat_automatica) VALUES (?, ?, ?, ?, ?, ?)";
-            $stmt = $mysqli->prepare($query);
+            $stmt  = $mysqli->prepare($query);
             $stmt->bind_param("isssii", $fk_lead, $jsondata, $website, $warning, $id_cat, $id_cat_automatica);
             $stmt->execute();
         }
 
         $stmt->close();
+        $response = array("id" => $id, "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
     }
 
     echo json_encode($response);
