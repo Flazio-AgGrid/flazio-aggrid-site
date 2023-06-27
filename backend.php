@@ -63,25 +63,46 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     //echo "Les données ont été transférées vers un fichier JSON avec succès.";
 }
 else if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $jsonData = file_get_contents('php://input');
+    $jsonData     = file_get_contents('php://input');
+    $modifiedData = json_decode($jsonData, true);
 
-    $modifiedData = json_decode(var_dump($jsonData), true);
-    
-    foreach ($modifiedData["modifiedData"] as $row) {
-        $id     = $row['id'];
-        $id_cat = $row['id_cat'];
+    $response = array();
 
-        $sql = "UPDATE reseller_experience_customer r LEFT JOIN maps_info m ON r.id = m.fk_lead SET m.id_cat = $id_cat WHERE r.id = $id";
+    $id     = $modifiedData["modifiedData"]["id"];
+    $id_cat = $modifiedData["modifiedData"]['id_cat'];
 
-        if ($mysqli->query($sql) === TRUE) {
-            $response = array("message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id, "sql" => $sql);
-            echo json_encode($response);
-        }
-        else {
-            $response = array("message" => "Erreur lors de la mise à jour pour l'enregistrement avec l'ID : " . $id, "erreur" => $mysqli->error);
-            echo json_encode($response);
-        }
+    // Check if the record exists
+    $checkSql = "SELECT COUNT(*) FROM maps_info WHERE fk_lead = ?";
+    $stmt     = $mysqli->prepare($checkSql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($count > 0) {
+        // Update the record if it exists
+        $updateSql = "UPDATE maps_info SET id_cat = ? WHERE fk_lead = ?";
+        $stmt      = $mysqli->prepare($updateSql);
+        $stmt->bind_param("ii", $id_cat, $id);
+        $stmt->execute();
+        $stmt->close();
+
+        $response = array("id" => $id, "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
     }
+    else {
+        // Insert the record with default data if it doesn't exist
+        $default_jsondata = json_encode(['formatted_address' => 'DEFAULT_STREET , 1234567, DEFAULT_DISTRICT, Italy', 'formatted_phone_number' => '123 xxx 6789', 'name' => 'Example', 'website' => 'http://www.example.it/']);
+        $insertSql        = "INSERT INTO maps_info (fk_lead, id_cat, jsondata, website, warning, id_cat_automatica) VALUES (?, ?, ?, 'default_website', 'default_warning', 'default_id_cat_automatica')";
+        $stmt             = $mysqli->prepare($insertSql);
+        $stmt->bind_param("iis", $id, $id_cat, $default_jsondata);
+        $stmt->execute();
+        $stmt->close();
+
+        $response = array("id" => $id, "message" => "Enregistrement créé avec succès pour l'ID : " . $id);
+    }
+
+    echo json_encode($response);
 
 }
 

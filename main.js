@@ -65,6 +65,13 @@ document.addEventListener("DOMContentLoaded", function () {
       gridOptions.api.setRowData(data.data);
       autoSizeAll();
       gridOptions.api.closeToolPanel();
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération des données:", error);
+      const body = document.querySelector("body");
+      const out = document.createElement("div");
+      out.innerHTML = error;
+      body.appendChild(out);
     });
 
   // Ajouter un gestionnaire d'événements pour écouter les modifications de cellule
@@ -126,10 +133,12 @@ function setCategory(data) {
   const data_tmp = data.data;
 
   data_tmp.forEach((el) => {
+    console.log(el.id_cat_automatica, el.id_cat);
     if (el.id_cat_automatica !== null) {
-      el.id_cat = categories[el.id_cat_automatica];
+      el.title_cat = categories[el.id_cat_automatica].title;
+      el.id_cat = categories[el.id_cat_automatica].id;
     } else if (el.id_cat !== null) {
-      el.id_cat = categories[el.id_cat];
+      el.title_cat = categories[el.id_cat].title;
     }
   });
 }
@@ -149,10 +158,6 @@ function saveChangesToBackend() {
       .then((response) => response.text())
       .then((result) => {
         console.log(result); // Afficher la réponse du backend
-        const body = document.querySelector("body");
-        const out = document.createElement("div");
-        out.innerHTML = result;
-        body.appendChild(out);
       })
       .catch((error) => {
         console.error("Erreur lors de l'envoi des données au backend:", error);
