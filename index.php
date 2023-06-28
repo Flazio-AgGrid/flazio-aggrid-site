@@ -3,9 +3,9 @@ session_start();
 
 // Vérifier si l'utilisateur est authentifié
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
-  // Rediriger vers une page d'erreur ou afficher un message d'erreur
-  header('Location: erreur.php');
-  exit;
+    // Rediriger vers une page d'erreur ou afficher un message d'erreur
+    header('Location: ./auth/auth.html');
+    exit;
 }
 ?>
 
