@@ -10,8 +10,11 @@
   "dependencies": {
     "@ag-grid-community/vue3": "^30.0.2",
     "@element-plus/icons-vue": "^2.1.0",
+<<<<<<< HEAD
     "@vueuse/core": "^10.2.1",
     "ag-grid-community": "^30.0.2",
+=======
+>>>>>>> 44afbda6e94f1d74e741c9e698115c8774aea110
     "ag-grid-vue3": "^30.0.2",
     "core-js": "^3.8.3",
     "element-plus": "^2.3.7",

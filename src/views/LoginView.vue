@@ -45,6 +45,7 @@ export default defineComponent({
           if (response.ok) {
             // Authentification réussie
             userStore.setAuthenticated(true);
+<<<<<<< HEAD
             userStore.setUsername(username.value);
             router.push({ name: "board" });
           } else {
@@ -52,6 +53,11 @@ export default defineComponent({
             userStore.setAuthenticated(true);
             userStore.setUsername(username.value);
             router.push({ name: "board" });
+=======
+            router.push({ name: "board" });
+          } else {
+            // Authentification échouée
+>>>>>>> 44afbda6e94f1d74e741c9e698115c8774aea110
             console.log("Erreur d'authentification");
           }
         })
