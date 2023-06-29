@@ -1,14 +1,4 @@
 <?php
-session_start();
-
-// Vérifier si l'utilisateur est authentifié
-if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] === true && $_SESSION['authenticated'] === false) {
-  // Rediriger vers une page d'erreur ou afficher un message d'erreur
-  header('Location: ../index.php');
-  exit;
-}
-?>
-<?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Récupérer les données du formulaire de connexion
   $username = $_POST['username'];
