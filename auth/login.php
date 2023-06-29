@@ -8,7 +8,6 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] === true &&
   exit;
 }
 ?>
-
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Récupérer les données du formulaire de connexion
@@ -37,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       session_start();
       $_SESSION['authenticated'] = true;
       http_response_code(200); // OK
+      header('Location: ../index.php');
     }
     else {
       // Authentification échouée

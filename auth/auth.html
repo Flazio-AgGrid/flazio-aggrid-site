@@ -9,7 +9,7 @@
       var password = document.getElementById('password').value;
 
       // Envoi de la requête POST avec les informations d'identification
-      fetch('login.php', {
+      fetch('./login.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -19,7 +19,7 @@
         .then(function (response) {
           if (response.ok) {
             // Rediriger vers index.php
-            window.location.href = 'index.php';
+            window.location.href = '../index.php';
           } else {
             // Afficher le message d'erreur
             alert('Authentification échouée');

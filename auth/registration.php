@@ -7,7 +7,7 @@
 
 <body>
   <h2>Registration</h2>
-  <form method="POST" action="registration.php">
+  <form method="POST" action="./registration.php">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required><br>
 
@@ -45,7 +45,7 @@
 
     if ($conn->query($query) === TRUE) {
       echo "Inscription réussie !";
-      header('Location: auth.html');
+      header('Location: ./auth.html');
     }
     else {
       echo "Erreur lors de l'inscription : " . $conn->error;
