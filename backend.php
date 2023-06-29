@@ -73,65 +73,67 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     //echo "Les données ont été transférées vers un fichier JSON avec succès.";
 }
 else if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $jsonData     = file_get_contents('php://input');
-    $modifiedData = json_decode($jsonData, true);
-
     $response = array();
 
-    $id     = $modifiedData["modifiedData"]["id"];
-    $id_cat = $modifiedData["modifiedData"]['id_cat'];
+    $jsonData     = file_get_contents('php://input');
+    $modifiedData = json_decode($jsonData, true);
+    // Traiter les résultats de la requête
+    foreach ($modifiedData['modifiedData'] as $row) {
+        $id     = $row["id"];
+        $id_cat = $row['id_cat'];
 
-    // Check if the record exists
-    $checkSql = "SELECT COUNT(*) FROM maps_info WHERE fk_lead = ?";
-    $stmt     = $mysqli->prepare($checkSql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->bind_result($count);
-    $stmt->fetch();
-    $stmt->close();
-
-    if ($count > 0) {
-        // Update the record if it exists
-        $updateSql = "UPDATE maps_info SET id_cat = ? WHERE fk_lead = ?";
-        $stmt      = $mysqli->prepare($updateSql);
-        $stmt->bind_param("ii", $id_cat, $id);
+        // Check if the record exists
+        $checkSql = "SELECT COUNT(*) FROM maps_info WHERE fk_lead = ?";
+        $stmt     = $mysqli->prepare($checkSql);
+        $stmt->bind_param("i", $id);
         $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
         $stmt->close();
 
-        $response = array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
-    }
-    else {
-        $query           = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
-        $result          = $mysqli->query($query);
-        $tableau_adresse = $result->fetch_all();
-
-        // Générer et insérer les données dans la table
-        foreach ($tableau_adresse as $row) {
-            $fk_lead           = $row[0];
-            $jsondata          = json_encode(
-                array(
-                    "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
-                    "formatted_phone_number" => "123 xxx 6789",
-                    "name"                   => "Example",
-                    "website"                => "http://www.example.it/"
-                )
-            );
-            $website           = "example.it";
-            $warning           = rand(0, 1);
-            $id_cat            = null;
-            $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
-
-            $query = "INSERT INTO maps_info (fk_lead, jsondata, website, warning, id_cat, id_cat_automatica) VALUES (?, ?, ?, ?, ?, ?)";
-            $stmt  = $mysqli->prepare($query);
-            $stmt->bind_param("isssii", $fk_lead, $jsondata, $website, $warning, $id_cat, $id_cat_automatica);
+        if ($count > 0) {
+            // Update the record if it exists
+            $updateSql = "UPDATE maps_info SET id_cat = ? WHERE fk_lead = ?";
+            $stmt      = $mysqli->prepare($updateSql);
+            $stmt->bind_param("ii", $id_cat, $id);
             $stmt->execute();
+            $stmt->close();
+
+            array_push($response, array("status" => "OK", "message" => "Mise a jour reussie pour l'enregistrement avec l'ID : " . $id));
         }
+        else {
+            $query           = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
+            $result          = $mysqli->query($query);
+            $tableau_adresse = $result->fetch_all();
 
-        $stmt->close();
-        $response = array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id);
+            // Générer et insérer les données dans la table
+            foreach ($tableau_adresse as $row) {
+                $fk_lead           = $row[0];
+                $jsondata          = json_encode(
+                    array(
+                        "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
+                        "formatted_phone_number" => "123 xxx 6789",
+                        "name"                   => "Example",
+                        "website"                => "http://www.example.it/"
+                    )
+                );
+                $website           = "example.it";
+                $warning           = rand(0, 1);
+                $id_cat            = null;
+                $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
+
+                $query = "INSERT INTO maps_info (fk_lead, jsondata, website, warning, id_cat, id_cat_automatica) VALUES (?, ?, ?, ?, ?, ?)";
+                $stmt  = $mysqli->prepare($query);
+                $stmt->bind_param("isssii", $fk_lead, $jsondata, $website, $warning, $id_cat, $id_cat_automatica);
+                $stmt->execute();
+            }
+
+            $stmt->close();
+            array_push($response, array("status" => "OK", "message" => "Mise a jour reussie pour l'enregistrement avec l'ID : " . $id));
+        }
     }
-
-    echo json_encode($response);
+    //var_dump(array('messages' => $response));
+    echo json_encode(array('messages' => $response));
 
 }
 

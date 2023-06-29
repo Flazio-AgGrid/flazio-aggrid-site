@@ -148,33 +148,58 @@ function setCategory(data) {
 
 function saveChangesToBackend() {
   var data_tmp = list_modified_row;
-  for (let i in data_tmp) {
-    const modifiedData = data_tmp[i];
-    console.log("Données modifiées :", modifiedData.id);
-    fetch("backend.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ modifiedData: modifiedData }),
+  fetch("backend.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ modifiedData: data_tmp }),
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result); // Afficher la réponse du backend
+      result.messages.map((el) => createNotification(el.message));
+      majDataFront();
     })
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result.status); // Afficher la réponse du backend
-        createNotification(result.message);
-        list_modified_row = [];
-      })
-      .catch((error) => {
-        console.error("Erreur lors de l'envoi des données au backend:", error);
-        createNotification(
-          `Erreur lors de l'envoi des données au backend: ${error}`
-        );
-        const body = document.querySelector("body");
-        const out = document.createElement("div");
-        out.innerHTML = error;
-        body.appendChild(out);
+    .catch((error) => {
+      console.error("Erreur lors de l'envoi des données au backend:", error);
+      createNotification(
+        `Erreur lors de l'envoi des données au backend: ${error}`
+      );
+      const body = document.querySelector("body");
+      const out = document.createElement("div");
+      out.innerHTML = error;
+      body.appendChild(out);
+    });
+}
+
+function majDataFront() {
+  fetch("backend.php")
+    .then((response) => response.json())
+    .then((data) => {
+      let cat_tab = [];
+      data.category.map((el) => {
+        cat_tab.push(el.title);
       });
-  }
+      gridOptions.columnDefs.find(
+        (colDef) => colDef.field === "title_cat"
+      ).cellEditorParams.values = cat_tab;
+      category = data.category;
+      setCategory(data);
+      gridOptions.api.setRowData(data.data);
+      autoSizeAll();
+      gridOptions.api.closeToolPanel();
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération des données:", error);
+      createNotification(
+        `Erreur lors de l'envoi des données au backend: ${error}`
+      );
+      const body = document.querySelector("body");
+      const out = document.createElement("div");
+      out.innerHTML = error;
+      body.appendChild(out);
+    });
 }
 
 function createNotification(text) {
