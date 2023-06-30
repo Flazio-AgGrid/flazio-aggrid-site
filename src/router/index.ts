@@ -10,10 +10,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: HomeView,
-<<<<<<< HEAD
     meta: { requiresAuth: false }, // Pas besoin d'authentification pour cette page
-=======
->>>>>>> 44afbda6e94f1d74e741c9e698115c8774aea110
   },
   {
     path: "/login",
