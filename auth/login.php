@@ -13,8 +13,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $conn = new mysqli($servername, $db_username, $db_password, $db_name);
 
   // Vérification des informations d'identification
-  $query  = "SELECT * FROM users WHERE username='$username'";
-  $result = $conn->query($query);
+
+require 'get_username';
+
+db\get_username($username);
+
+$result = $conn->query($query);
 
   if ($result->num_rows == 1) {
     $row                  = $result->fetch_assoc();

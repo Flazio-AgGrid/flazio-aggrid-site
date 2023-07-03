@@ -41,7 +41,11 @@
     }
 
     // Requête d'insertion pour enregistrer l'utilisateur dans la base de données
-    $query = "INSERT INTO users (username, password) VALUES ('$username', '$hashedPassword')";
+  
+    require 'set_register';
+
+    db\set_register($username, $hashedPassword);
+
 
     if ($conn->query($query) === TRUE) {
       echo "Inscription réussie !";
