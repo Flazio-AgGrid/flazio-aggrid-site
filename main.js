@@ -96,12 +96,20 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+/**
+ * Récupère les données modifiées et réassigne l'ID de la catégorie correspondante.
+ * @param {Object} rowModified - Ligne modifiée.
+ * @returns {Object} - Ligne modifiée avec l'ID de la catégorie réassigné.
+ */
 function reassignationIdCat(rowModified) {
   const newIdCat = category.find((el) => el.title === rowModified.title_cat);
   rowModified.id_cat = newIdCat.id;
   return rowModified;
 }
 
+/**
+ * Crée un bouton "Save Changes" et l'ajoute au document.
+ */
 function createSaveButton() {
   const saveButton = document.createElement("button");
   saveButton.textContent = "Save Changes";
@@ -122,6 +130,10 @@ function createSaveButton() {
   document.body.appendChild(saveButton);
 }
 
+/**
+ * Redimensionne automatiquement toutes les colonnes de la grille.
+ * @param {boolean} [skipHeader=false] - Indique si l'en-tête doit être exclu du redimensionnement.
+ */
 function autoSizeAll(skipHeader) {
   const allColumnIds = [];
   gridOptions.columnApi.getColumns().forEach((column) => {
@@ -131,6 +143,10 @@ function autoSizeAll(skipHeader) {
   gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
 }
 
+/**
+ * Initialise les catégories et les données de la grille.
+ * @param {Object} data - Données à utiliser.
+ */
 function setCategory(data) {
   const categories = data.category;
   const data_tmp = data.data;
@@ -146,6 +162,9 @@ function setCategory(data) {
   });
 }
 
+/**
+ * Envoie les modifications vers le backend pour être sauvegardées.
+ */
 function saveChangesToBackend() {
   var data_tmp = list_modified_row;
   fetch("backend.php", {
@@ -173,6 +192,9 @@ function saveChangesToBackend() {
     });
 }
 
+/**
+ * Met à jour les données affichées dans la grille après la sauvegarde.
+ */
 function majDataFront() {
   fetch("backend.php")
     .then((response) => response.json())
@@ -202,6 +224,10 @@ function majDataFront() {
     });
 }
 
+/**
+ * Crée une notification et l'ajoute à l'interface utilisateur.
+ * @param {string} text - Texte de la notification.
+ */
 function createNotification(text) {
   var notificationsContainer = document.getElementById(
     "notifications-container"
