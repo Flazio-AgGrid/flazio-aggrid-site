@@ -2,9 +2,9 @@
 session_start();
 
 // Vérifier si l'utilisateur est authentifié
-if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
+if (!isset($_SESSION['authenticated'])) {
     // Rediriger vers une page d'erreur ou afficher un message d'erreur
-    header('Location: ./auth/auth.html');
+    header('Location: ./auth/erreur.php');
     exit;
 }
 ?>
@@ -13,7 +13,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 <html lang="en">
 
 <head>
-    <title>JavaScript example</title>
+    <title>CRM Flazio</title>
     <meta charSet="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style media="only screen">
@@ -44,6 +44,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 <body>
     <div id="myGrid" class="ag-theme-alpine" style="height: 100%">
     </div>
+    <div id="buttonArea" style="position: fixed; bottom: 10px; right: 20px;"></div>
     <script>var __basePath = './';</script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js">
     </script>

@@ -7,7 +7,7 @@
 
 <body>
   <h2>Registration</h2>
-  <form method="POST" action="./registration.php">
+  <form method="POST" action="registration.php">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required><br>
 
@@ -15,10 +15,12 @@
     <input type="password" id="password" name="password" required><br>
 
     <input type="submit" value="Register">
-    <a href="./auth.html">Login</a>
+    <a href="login.php">Login</a>
   </form>
 
   <?php
+  require '../backend/db.php';
+
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire d'inscription
     $username = $_POST['username'];
@@ -27,36 +29,15 @@
     // Chiffrer le mot de passe
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    // Connexion à la base de données
-    $servername  = "localhost";
-    $db_username = "root";
-    $db_password = "";
-    $db_name     = "reseller_experience";
-
-    $conn = new mysqli($servername, $db_username, $db_password, $db_name);
-
-    // Vérifier la connexion à la base de données
-    if ($conn->connect_error) {
-      die("Erreur de connexion à la base de données : " . $conn->connect_error);
-    }
-
-    // Requête d'insertion pour enregistrer l'utilisateur dans la base de données
-  
-    require 'set_register';
-
-    db\set_register($username, $hashedPassword);
-
-
-    if ($conn->query($query) === TRUE) {
+    // Appeler la fonction pour enregistrer l'utilisateur dans la base de données
+    if (db\set_register($username, $hashedPassword)) {
       echo "Inscription réussie !";
-      header('Location: ./auth.html');
+      header('Location: login.php');
+      exit; // Terminer l'exécution du script après la redirection
     }
     else {
-      echo "Erreur lors de l'inscription : " . $conn->error;
+      echo "Erreur lors de l'inscription !";
     }
-
-    // Fermer la connexion à la base de données
-    $conn->close();
   }
   ?>
 

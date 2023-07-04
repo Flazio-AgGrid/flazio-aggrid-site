@@ -9,7 +9,7 @@
   <h1>Erreur d'accès</h1>
   <p>Vous n'êtes pas autorisé à accéder à cette page. Veuillez vous authentifier pour continuer.</p>
 
-  <a href="./auth/auth.html">Retour</a>
+  <a href="../auth/login.php">Retour</a>
 
 </body>
 

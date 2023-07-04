@@ -46,53 +46,97 @@ const gridOptions = {
 var category = {};
 list_modified_row = [];
 
+/**
+ * Fonction exécutée lorsque le DOM est chargé.
+ */
 document.addEventListener("DOMContentLoaded", function () {
+  // Sélectionner l'élément de la grille dans le DOM
   var gridDiv = document.querySelector("#myGrid");
+
+  // Créer une instance de la grille avec les options spécifiées
   new agGrid.Grid(gridDiv, gridOptions);
 
-  fetch("backend.php")
+  // Récupérer les données à partir du backend
+  fetch("backend.php?page=index")
     .then((response) => response.json())
     .then((data) => {
+      console.log(data);
+      // Extraire les titres des catégories pour les paramètres de l'éditeur de cellules
       let cat_tab = [];
       data.category.map((el) => {
         cat_tab.push(el.title);
       });
+
+      // Mettre à jour les valeurs des paramètres de l'éditeur de cellules pour la colonne "title_cat"
       gridOptions.columnDefs.find(
         (colDef) => colDef.field === "title_cat"
       ).cellEditorParams.values = cat_tab;
+
+      // Stocker les catégories dans une variable globale
       category = data.category;
+
+      // Appliquer les données à la grille
       setCategory(data);
       gridOptions.api.setRowData(data.data);
       autoSizeAll();
       gridOptions.api.closeToolPanel();
+
+      // Créer le bouton de gestion
+      createManagementButton();
     })
     .catch((error) => {
       console.error("Erreur lors de la récupération des données:", error);
       createNotification(
         `Erreur lors de l'envoi des données au backend: ${error}`
       );
+
+      // Afficher l'erreur dans le DOM
       const body = document.querySelector("body");
       const out = document.createElement("div");
       out.innerHTML = error;
       body.appendChild(out);
     });
 
-  // Ajouter un gestionnaire d'événements pour écouter les modifications de cellule
+  /**
+   * Gestionnaire d'événements pour les modifications de cellule dans la grille.
+   */
   gridOptions.api.addEventListener("cellValueChanged", function (event) {
-    // Récupérer les données modifiées
-    const modifiedData = reassignationIdCat(event.data);
-    const existingRow = list_modified_row.find(
-      (row) => row.id === modifiedData.id
-    );
-    if (existingRow) {
-      Object.assign(existingRow, modifiedData);
+    // Vérifier si la valeur de la cellule a été supprimée
+    if (event.newValue === null || event.newValue === "") {
+      // Supprimer la ligne modifiée de la liste
+      const index = list_modified_row.findIndex(
+        (row) => row.id === event.data.id
+      );
+      if (index !== -1) {
+        list_modified_row.splice(index, 1);
+      }
     } else {
-      list_modified_row.push(modifiedData);
+      // Récupérer les données modifiées
+      const modifiedData = reassignationIdCat(event.data);
+      const existingRow = list_modified_row.find(
+        (row) => row.id === modifiedData.id
+      );
+      if (existingRow) {
+        Object.assign(existingRow, modifiedData);
+      } else {
+        list_modified_row.push(modifiedData);
+      }
     }
-    if (list_modified_row.length === 1) {
+
+    // Vérifier s'il faut créer ou supprimer le bouton de sauvegarde
+    if (
+      list_modified_row.length >= 1 &&
+      !document.getElementById("bouttonSave")
+    ) {
       createSaveButton();
+    } else if (
+      list_modified_row.length <= 0 &&
+      document.getElementById("bouttonSave")
+    ) {
+      const button = document.getElementById("bouttonSave");
+      button.parentNode.removeChild(button);
     }
-    console.log(list_modified_row);
+    console.debug(list_modified_row);
   });
 });
 
@@ -111,12 +155,12 @@ function reassignationIdCat(rowModified) {
  * Crée un bouton "Save Changes" et l'ajoute au document.
  */
 function createSaveButton() {
+  const buttonArea = document.getElementById("buttonArea");
   const saveButton = document.createElement("button");
+  saveButton.id = "bouttonSave";
   saveButton.textContent = "Save Changes";
-  saveButton.style.position = "fixed";
-  saveButton.style.bottom = "20px";
-  saveButton.style.right = "20px";
   saveButton.style.padding = "10px";
+  saveButton.style.margin = "5px";
   saveButton.style.backgroundColor = "#007bff";
   saveButton.style.color = "#fff";
   saveButton.style.border = "none";
@@ -127,7 +171,29 @@ function createSaveButton() {
     saveChangesToBackend();
   });
 
-  document.body.appendChild(saveButton);
+  buttonArea.appendChild(saveButton);
+}
+
+/**
+ * Crée un bouton "Save Changes" et l'ajoute au document.
+ */
+function createManagementButton() {
+  const buttonArea = document.getElementById("buttonArea");
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Go to Management Page";
+  saveButton.style.padding = "10px";
+  saveButton.style.margin = "5px";
+  saveButton.style.backgroundColor = "#49a1ff";
+  saveButton.style.color = "#fff";
+  saveButton.style.border = "none";
+  saveButton.style.borderRadius = "5px";
+  saveButton.style.cursor = "pointer";
+
+  saveButton.addEventListener("click", function () {
+    load_manually_reseller_category();
+  });
+
+  buttonArea.appendChild(saveButton);
 }
 
 /**
@@ -152,7 +218,7 @@ function setCategory(data) {
   const data_tmp = data.data;
 
   data_tmp.forEach((el) => {
-    console.log(el.id_cat_automatica, el.id_cat);
+    console.debug(el.id, el.id_cat_automatica, el.id_cat);
     if (el.id_cat_automatica !== null) {
       el.title_cat = categories[el.id_cat_automatica].title;
       el.id_cat = categories[el.id_cat_automatica].id;
@@ -167,7 +233,7 @@ function setCategory(data) {
  */
 function saveChangesToBackend() {
   var data_tmp = list_modified_row;
-  fetch("backend.php", {
+  fetch("backend.php?page=index", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -176,7 +242,8 @@ function saveChangesToBackend() {
   })
     .then((response) => response.json())
     .then((result) => {
-      console.log(result); // Afficher la réponse du backend
+      list_modified_row = [];
+      console.debug(result); // Afficher la réponse du backend
       result.messages.map((el) => createNotification(el.message));
       majDataFront();
     })
@@ -196,7 +263,7 @@ function saveChangesToBackend() {
  * Met à jour les données affichées dans la grille après la sauvegarde.
  */
 function majDataFront() {
-  fetch("backend.php")
+  fetch("backend.php?page=index")
     .then((response) => response.json())
     .then((data) => {
       let cat_tab = [];
@@ -238,7 +305,7 @@ function createNotification(text) {
     notificationsContainer.style.display = "flex";
     notificationsContainer.style.flexDirection = "column";
     notificationsContainer.style.position = "fixed";
-    notificationsContainer.style.bottom = "20px";
+    notificationsContainer.style.bottom = "60px";
     notificationsContainer.style.right = "20px";
     document.body.appendChild(notificationsContainer);
   }
@@ -270,4 +337,36 @@ function createNotification(text) {
       notification.parentNode.removeChild(notification);
     }, 300);
   }, 3000);
+}
+
+function load_manually_reseller_category() {
+  fetch("backend.php?page=management")
+    .then((response) => response.json())
+    .then((data) => {
+      let cat_tab = [];
+      data.category.map((el) => {
+        cat_tab.push(el.title);
+      });
+      gridOptions.columnDefs.find(
+        (colDef) => colDef.field === "title_cat"
+      ).cellEditorParams.values = cat_tab;
+
+      category = data.category;
+
+      setCategory(data);
+
+      gridOptions.api.setRowData(data.data);
+      autoSizeAll();
+      gridOptions.api.closeToolPanel();
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération des données:", error);
+      createNotification(
+        `Erreur lors de l'envoi des données au backend: ${error}`
+      );
+      const body = document.querySelector("body");
+      const out = document.createElement("div");
+      out.innerHTML = error;
+      body.appendChild(out);
+    });
 }

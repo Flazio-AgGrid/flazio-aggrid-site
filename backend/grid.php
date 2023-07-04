@@ -10,8 +10,6 @@ require 'db.php';
  */
 function get_reseller_category()
 {
-    $error = ""; // Variable inutilisée pour l'instant
-
     // Récupérer les données des revendeurs depuis la base de données
     $result_data = \db\get_reseller();
 
@@ -39,8 +37,7 @@ function get_reseller_category()
     // Créer un tableau final contenant les données des revendeurs et des catégories
     $finalData = array(
         "data"     => $data,
-        "category" => $cat,
-        "error"    => $error // Variable inutilisée pour l'instant
+        "category" => $cat
     );
 
     // Convertir le tableau en JSON
@@ -51,9 +48,9 @@ function get_reseller_category()
 }
 
 /**
- * Met à jour la catégorie d'un revendeur.
+ * Met à jour les catégories des revendeurs en fonction des données modifiées reçues via une requête POST.
  *
- * @return void
+ * @return string La réponse au format JSON contenant les messages de mise à jour.
  */
 function update_reseller_category()
 {
@@ -64,10 +61,76 @@ function update_reseller_category()
     $jsonData     = file_get_contents('php://input');
     $modifiedData = json_decode($jsonData, true);
 
+    foreach ($modifiedData['modifiedData'] as $row) {
+        $id     = $row["id"];
+        $id_cat = $row['id_cat'];
+        $count  = \db\get_verify_fk_lead_exists($row, $id, $id_cat);
+
+        if ($count > 0) {
+            \db\update_fk_lead($id, $id_cat);
+            array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
+        }
+        else {
+            $tableau = \db\get_adress_reseller($id);
+            \db\set_fake_maps_info($tableau);
+            array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
+        }
+    }
+
     // Appeler la fonction de mise à jour des catégories des revendeurs et récupérer la réponse
-    $response = \db\update_reseller_category($modifiedData);
+    $response = json_encode(array('messages' => $response));
 
     // Retourner la réponse au format JSON
     return $response;
 }
+
+function get_manually_reseller_category()
+{
+    // Récupérer les données des revendeurs depuis la base de données
+    $result_data = \db\get_reseller_set_manually();
+
+    // Récupérer les données des catégories depuis la base de données
+    $result_cat = \db\get_category();
+
+    $result_status = \db\get_status();
+
+    // Créer un tableau pour stocker les données des revendeurs
+    $data = array();
+
+    // Traiter les résultats de la requête des revendeurs
+    while ($row = $result_data->fetch_assoc()) {
+        // Ajouter chaque ligne de résultat au tableau
+        $data[] = $row;
+    }
+
+    // Créer un tableau pour stocker les données des catégories
+    $cat = array();
+
+    // Traiter les résultats de la requête des catégories
+    while ($row = $result_cat->fetch_assoc()) {
+        // Ajouter chaque ligne de résultat au tableau
+        $cat[] = $row;
+    }
+
+    $status = array();
+
+    while ($row = $result_status->fetch_assoc()) {
+        // Ajouter chaque ligne de résultat au tableau
+        $status[] = $row;
+    }
+
+    // Créer un tableau final contenant les données des revendeurs et des catégories
+    $finalData = array(
+        "data"     => $data,
+        "category" => $cat,
+        "status"   => $status
+    );
+
+    // Convertir le tableau en JSON
+    $jsonData = json_encode($finalData);
+
+    // Retourner les données au format JSON
+    return $jsonData;
+}
+
 ?>

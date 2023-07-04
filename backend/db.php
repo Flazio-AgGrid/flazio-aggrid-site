@@ -14,7 +14,7 @@ if ($mysqli->connect_errno) {
 
 /**
  * Récupère les revendeurs qui n'ont pas de catégorie assignée
- * @return mixed|null Résultat de la requête
+ * @return mixed|false Résultat de la requête
  */
 function get_reseller()
 {
@@ -28,12 +28,13 @@ function get_reseller()
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
     }
 }
 
 /**
  * Récupère les catégories
- * @return mixed|null Résultat de la requête
+ * @return mixed|false Résultat de la requête
  */
 function get_category()
 {
@@ -47,38 +48,7 @@ function get_category()
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
-        return null;
-    }
-}
-
-/**
- * Met à jour la catégorie d'un revendeur
- * @param $modifiedData Données modifiées
- * @return false|null|string Résultat de la mise à jour au format JSON
- */
-function update_reseller_category($modifiedData)
-{
-    $response = array();
-    try {
-        foreach ($modifiedData['modifiedData'] as $row) {
-            $id     = $row["id"];
-            $id_cat = $row['id_cat'];
-            $count  = get_verify_fk_lead_exists($row, $id, $id_cat);
-            if ($count > 0) {
-                update_fk_lead($id, $id_cat);
-                array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
-            }
-            else {
-                $tableau = get_adress_reseller($id);
-                set_fake_maps_info($tableau);
-                array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
-            }
-        }
-        return json_encode(array('messages' => $response));
-    }
-    catch (\Throwable $th) {
-        echo "Une erreur s'est produite : " . $th->getMessage();
-        return null;
+        return false;
     }
 }
 
@@ -87,7 +57,7 @@ function update_reseller_category($modifiedData)
  * @param $row Ligne de données
  * @param $id Identifiant de l'enregistrement
  * @param $id_cat Identifiant de catégorie
- * @return int|null Nombre d'enregistrements trouvés
+ * @return int|false Nombre d'enregistrements trouvés
  */
 function get_verify_fk_lead_exists($row, $id, $id_cat)
 {
@@ -109,7 +79,7 @@ function get_verify_fk_lead_exists($row, $id, $id_cat)
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
-        return null;
+        return false;
     }
 }
 
@@ -141,7 +111,7 @@ function update_fk_lead($id, $id_cat)
 /**
  * Récupère l'adresse d'un revendeur
  * @param $id Identifiant de l'enregistrement
- * @return mixed|null Tableau contenant les informations d'adresse
+ * @return mixed|false Tableau contenant les informations d'adresse
  */
 function get_adress_reseller($id)
 {
@@ -156,7 +126,7 @@ function get_adress_reseller($id)
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
-        return null;
+        return false;
     }
 }
 
@@ -193,6 +163,96 @@ function set_fake_maps_info($tableau)
         }
         $stmt->close();
         return true;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+/**
+ * Récupère un utilisateur en fonction de son nom d'utilisateur et de son mot de passe.
+ * @param string $username - Le nom d'utilisateur.
+ * @return mysqli_result | false - Le résultat de la requête si elle réussit, sinon false en cas d'erreur.
+ */
+function get_username($username)
+{
+    global $mysqli;
+    try {
+        // Utiliser une requête préparée pour éviter l'injection SQL
+        $query = "SELECT * FROM users WHERE username = ?";
+        $stmt  = $mysqli->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+
+/**
+ * Insère un nouvel enregistrement dans la table "users" avec un nom d'utilisateur et un mot de passe donnés.
+ *
+ * @param string $username Le nom d'utilisateur à insérer.
+ * @param string $hashedPassword Le mot de passe haché à insérer.
+ * @return bool Retourne `true` si l'insertion a réussi, sinon `false`.
+ */
+function set_register($username, $hashedPassword)
+{
+    global $mysqli;
+
+    $query = "INSERT INTO users (username, password) VALUES (?, ?)";
+
+    try {
+        $stmt = $mysqli->prepare($query);
+        $stmt->bind_param("ss", $username, $hashedPassword);
+        $stmt->execute();
+        $stmt->close();
+        return true;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+/**
+ * Récupère les informations des revendeurs qui n'ont pas de catégorie automatique assignée.
+ * @return mysqli_result|false - Résultat de la requête contenant les informations des revendeurs, ou false en cas d'erreur.
+ */
+function get_reseller_set_manually()
+{
+    global $mysqli;
+
+    $query = "SELECT r.id, r.AccountID, r.TaxRegID, r.Nome, r.Cognome, r.RagioneSociale, r.Email, r.Indirizzo, r.Comune, r.CAP, r.Provincia, r.Tel, r.NumMobile, r.NumPagineDaAttivare, r.NumPagineAttivate, r.status, r.create_dt, r.update_dt, r.readed, r.reseller_experience_manager_id, r.CAOName, IF( r.lead_status_cat IS NULL, 'open', l.title ) AS lead_status, m.id_cat, m.id_cat_automatica FROM reseller_experience_customer r LEFT JOIN maps_info m ON r.id = m.fk_lead LEFT JOIN lead_status l ON r.lead_status_cat = l.id WHERE m.id_cat_automatica IS NULL AND m.id_cat IS NOT NULL;";
+
+    try {
+        $result_data = $mysqli->query($query);
+        return $result_data;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+/**
+ * Récupère les informations des statuts de leads.
+ * @return mysqli_result|false - Résultat de la requête contenant les informations des statuts, ou false en cas d'erreur.
+ */
+function get_status()
+{
+    global $mysqli;
+
+    $query = "SELECT id, title FROM lead_status;";
+
+    try {
+        $result_data = $mysqli->query($query);
+        return $result_data;
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
