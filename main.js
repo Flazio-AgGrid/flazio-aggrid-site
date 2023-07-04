@@ -205,6 +205,7 @@ function createManagementButton() {
   managementButton.addEventListener("click", function () {
     load_manually_reseller_category();
     removeButton("bouttonManagement");
+    removeButton("bouttonSave");
     createResetPageButton();
   });
 
@@ -473,9 +474,22 @@ function load_manually_reseller_category() {
         editable: true,
         pinned: "right",
         cellEditor: "agRichSelectCellEditor",
-        cellEditorPopup: false,
         cellEditorParams: {
           values: [],
+        },
+        cellStyle: function getStatusCellStyle(params) {
+          const status = params.value;
+
+          if (status === "open") {
+            return { backgroundColor: "lightgreen", color: "black" };
+          } else if (status === "working") {
+            return { backgroundColor: "orange", color: "black" };
+          } else if (status === "completed") {
+            return { backgroundColor: "lightgray", color: "black" };
+          }
+
+          // Style par défaut pour les autres valeurs
+          return null;
         },
       });
 
