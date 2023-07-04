@@ -228,7 +228,7 @@ function get_reseller_set_manually()
 {
     global $mysqli;
 
-    $query = "SELECT r.id, r.AccountID, r.TaxRegID, r.Nome, r.Cognome, r.RagioneSociale, r.Email, r.Indirizzo, r.Comune, r.CAP, r.Provincia, r.Tel, r.NumMobile, r.NumPagineDaAttivare, r.NumPagineAttivate, r.status, r.create_dt, r.update_dt, r.readed, r.reseller_experience_manager_id, r.CAOName, IF( r.lead_status_cat IS NULL, 'open', l.title ) AS lead_status, m.id_cat, m.id_cat_automatica FROM reseller_experience_customer r LEFT JOIN maps_info m ON r.id = m.fk_lead LEFT JOIN lead_status l ON r.lead_status_cat = l.id WHERE m.id_cat_automatica IS NULL AND m.id_cat IS NOT NULL;";
+    $query = "SELECT r.id, r.AccountID, r.TaxRegID, r.Nome, r.Cognome, r.RagioneSociale, r.Email, r.Indirizzo, r.Comune, r.CAP, r.Provincia, r.Tel, r.NumMobile, r.NumPagineDaAttivare, r.NumPagineAttivate, r.status, r.create_dt, r.update_dt, r.readed, r.reseller_experience_manager_id, r.CAOName, IF(r.lead_status_cat IS NULL, 1, r.lead_status_cat) AS lead_status, m.id_cat, m.id_cat_automatica FROM reseller_experience_customer r INNER JOIN maps_info m ON r.id = m.fk_lead LEFT JOIN lead_status l ON r.lead_status_cat = l.id WHERE m.id_cat_automatica IS NULL AND m.id_cat IS NOT NULL;";
 
     try {
         $result_data = $mysqli->query($query);
@@ -253,6 +253,27 @@ function get_status()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function update_status_lead($id, $lead_status)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE reseller_experience_customer SET lead_status_cat = ? WHERE reseller_experience_customer.id = ?";
+
+    try {
+        // Vérifie si l'enregistrement existe
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("ii", $lead_status, $id);
+        $stmt->execute();
+        $stmt->close();
+
+        return true;
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();

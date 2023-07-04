@@ -22,7 +22,7 @@ switch ($page) {
             echo grid\get_manually_reseller_category();
         }
         else if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            echo grid\update_reseller_category();
+            echo grid\update_manually_reseller_category();
         }
         break;
 

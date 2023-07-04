@@ -133,4 +133,32 @@ function get_manually_reseller_category()
     return $jsonData;
 }
 
+function update_manually_reseller_category()
+{
+    // Tableau de réponse
+    $response = array();
+
+    // Récupérer les données modifiées depuis la requête POST
+    $jsonData     = file_get_contents('php://input');
+    $modifiedData = json_decode($jsonData, true);
+    $row          = $modifiedData['modifiedData'];
+    $id           = $row["id"];
+    $lead_status  = $row['lead_status'];
+
+    if (\db\update_status_lead($id, $lead_status)) {
+        array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id, "data" => $id . "&" . $lead_status));
+    }
+    else {
+        array_push($response, array("status" => "FAILED", "message" => "Mise à jour échoué pour l'enregistrement avec l'ID : " . $id));
+    }
+
+
+
+    // Appeler la fonction de mise à jour des catégories des revendeurs et récupérer la réponse
+    $response = json_encode(array('messages' => $response));
+
+    // Retourner la réponse au format JSON
+    return $response;
+}
+
 ?>
