@@ -19,7 +19,7 @@
   </form>
 
   <?php
-  require '../backend/db.php';
+  require_once '../backend/db.php';
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire d'inscription

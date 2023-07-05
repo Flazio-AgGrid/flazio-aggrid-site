@@ -310,12 +310,23 @@ function setStatus(data) {
  */
 function saveChangesToBackend() {
   var data_tmp = list_modified_row;
+  const php_user = null;
+  if (document.cookie.match(/PHP_USER/) === null) {
+    console.log(document.cookie.match(/PHP_USER/));
+    createNotification(`Please log in!`);
+    document.cookie = "";
+    document.location.reload();
+    return false;
+  }
+  {
+    const php_user = document.cookie.match(/PHP_USER/);
+  }
   fetch("backend.php?page=index", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data_tmp }),
+    body: JSON.stringify({ modifiedData: data_tmp, initiator: php_user }),
   })
     .then((response) => response.json())
     .then((result) => {
@@ -341,12 +352,23 @@ function saveChangesToBackend() {
  * @param {Object} data - Les données modifiées à envoyer.
  */
 function saveChangesToBackendAuto(data) {
+  const php_user = null;
+  if (document.cookie.match(/PHP_USER/) === null) {
+    console.log(document.cookie.match(/PHP_USER/));
+    createNotification(`Please log in!`);
+    document.cookie = "";
+    document.location.reload();
+    return false;
+  }
+  {
+    const php_user = document.cookie.match(/PHP_USER/);
+  }
   fetch("backend.php?page=management", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data }),
+    body: JSON.stringify({ modifiedData: data_tmp, initiator: php_user }),
   })
     .then((response) => response.json())
     .then((result) => {

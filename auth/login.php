@@ -21,7 +21,7 @@
 </html>
 
 <?php
-require '../backend/db.php';
+require_once '../backend/db.php';
 
 session_start();
 
@@ -46,15 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['authenticated'] = true;
         header('Location: ../index.php');
         exit;
-      } else {
+      }
+      else {
         // Mot de passe incorrect
         echo 'Mot de passe incorrect.';
       }
-    } else {
+    }
+    else {
       // Nom d'utilisateur incorrect
       echo 'Nom d\'utilisateur incorrect.';
     }
-  } else {
+  }
+  else {
     // Erreur de connexion à la base de données
     echo 'Erreur de connexion à la base de données.';
   }

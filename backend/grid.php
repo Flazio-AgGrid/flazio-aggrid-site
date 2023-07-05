@@ -1,7 +1,8 @@
 <?php
 namespace grid;
 
-require 'db.php';
+require_once 'db.php';
+require_once 'logs.php';
 
 /**
  * Récupère les données des revendeurs et des catégories depuis la base de données.
@@ -61,17 +62,28 @@ function update_reseller_category()
     $jsonData     = file_get_contents('php://input');
     $modifiedData = json_decode($jsonData, true);
 
+    $status_logs = array(); // Tableau pour stocker les logs de statut
+
     foreach ($modifiedData['modifiedData'] as $row) {
         $id     = $row["id"];
         $id_cat = $row['id_cat'];
         $count  = \db\get_verify_fk_lead_exists($row, $id, $id_cat);
 
         if ($count > 0) {
+            foreach ($modifiedData['initiator'] as $user) {
+                $status_logs[] = \log\set_log('updated', $user, $id);
+            }
+
             \db\update_fk_lead($id, $id_cat);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
         }
         else {
             $tableau = \db\get_adress_reseller($id);
+
+            foreach ($modifiedData['initiator'] as $user) {
+                $status_logs[] = \log\set_log('updated', $user, $id);
+            }
+
             \db\set_fake_maps_info($tableau);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
         }
@@ -83,6 +95,7 @@ function update_reseller_category()
     // Retourner la réponse au format JSON
     return $response;
 }
+
 
 function get_manually_reseller_category()
 {
@@ -144,6 +157,10 @@ function update_manually_reseller_category()
     $row          = $modifiedData['modifiedData'];
     $id           = $row["id"];
     $lead_status  = $row['lead_status'];
+
+    foreach ($modifiedData['initiator'] as $user) {
+        \log\set_log('updated', $user, $id);
+    }
 
     if (\db\update_status_lead($id, $lead_status)) {
         array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id, "data" => $id . "&" . $lead_status));
