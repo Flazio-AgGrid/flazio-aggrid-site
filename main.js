@@ -342,7 +342,6 @@ function saveChangesToBackend() {
     .then((response) => response.json())
     .then((result) => {
       list_modified_row = [];
-      console.debug(result); // Affiche la réponse du backend
       result.messages.map((el) => createNotification(el.message));
       majDataFront("index");
     })
@@ -642,7 +641,6 @@ function getCookie(name) {
     // Vérifier si le nom du cookie correspond à celui recherché
     if (cookie.indexOf(name + "=") === 0) {
       // Extraire la valeur du cookie
-      console.log(cookie.substring(name.length + 1));
       return cookie.substring(name.length + 1);
     }
   }
