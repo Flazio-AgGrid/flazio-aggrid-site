@@ -180,7 +180,7 @@ function get_username($username)
     global $mysqli;
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL
-        $query = "SELECT * FROM users WHERE username = ?";
+        $query = "SELECT username, password, id FROM users WHERE username = ?";
         $stmt  = $mysqli->prepare($query);
         $stmt->bind_param("s", $username);
         $stmt->execute();
