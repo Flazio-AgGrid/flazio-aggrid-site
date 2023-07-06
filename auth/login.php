@@ -21,7 +21,7 @@
 </html>
 
 <?php
-require '../backend/db.php';
+require '../backend/auth.php';
 
 session_start();
 
@@ -29,43 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Récupérer les données du formulaire de connexion
   $username = $_POST['username'];
   $password = $_POST['password'];
+  auth\login($username, $password);
 
-  // Vérifier si la connexion à la base de données est établie
-  if (isset($mysqli) && $mysqli instanceof mysqli) {
-    // Appeler la fonction pour obtenir les informations de l'utilisateur
-    $result = db\get_username($username);
-
-    // Vérifier si l'utilisateur existe dans la base de données
-    if ($result && $result->num_rows == 1) {
-      $row = $result->fetch_assoc();
-      $hashedPasswordFromDB = $row['password'];
-
-      // Vérifier si le mot de passe fourni correspond au hachage stocké
-      if (password_verify($password, $hashedPasswordFromDB)) {
-        // Authentification réussie
-        $_SESSION['authenticated'] = true;
-
-        // Récupération de l'ID de l'utilisateur depuis la base de données
-        $userId = $row['id'];
-        // Stockage de l'ID de l'utilisateur dans un cookie distinct
-        $idCookieName = "PHP_USER";
-        $idCookieValue = $userId;
-        $idExpiration = time() + (24 * 60 * 60);
-        setcookie($idCookieName, $idCookieValue, $idExpiration, '/');
-
-        header('Location: ../index.php');
-        exit;
-      } else {
-        // Mot de passe incorrect
-        echo 'Mot de passe incorrect.';
-      }
-    } else {
-      // Nom d'utilisateur incorrect
-      echo 'Nom d\'utilisateur incorrect.';
-    }
-  } else {
-    // Erreur de connexion à la base de données
-    echo 'Erreur de connexion à la base de données.';
-  }
 }
 ?>

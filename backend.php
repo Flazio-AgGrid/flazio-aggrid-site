@@ -1,8 +1,16 @@
 <?php
+session_start();
 
-// session_start();
-
-require "./backend/grid.php";
+require_once './backend/auth.php';
+// Vérifier si l'utilisateur est authentifié
+if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
+    // Rediriger vers une page d'erreur ou afficher un message d'erreur
+    header('Location: ./auth/erreur.php');
+    exit;
+}
+?>
+<?php
+require_once "./backend/grid.php";
 
 $page = $_GET['page'] ?? '';
 
@@ -10,18 +18,22 @@ $page = $_GET['page'] ?? '';
 switch ($page) {
     case 'index':
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            auth\checkLogin();
             echo grid\get_reseller_category();
         }
         else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            auth\checkLogin();
             echo grid\update_reseller_category();
         }
         break;
 
     case 'management':
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            auth\checkLogin();
             echo grid\get_manually_reseller_category();
         }
         else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            auth\checkLogin();
             echo grid\update_manually_reseller_category();
         }
         break;

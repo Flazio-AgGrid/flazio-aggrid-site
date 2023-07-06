@@ -248,19 +248,29 @@ function autoSizeAll(skipHeader) {
 }
 
 /**
- * Initialise les catégories et les données de la grille.
- * @param {Object} data - Données à utiliser.
+ * Met à jour les catégories des données en utilisant les informations de la variable `data`.
+ *
+ * @param {object} data - Les données contenant les catégories et les données à mettre à jour.
  */
 function setCategory(data) {
   const categories = data.category;
   const data_tmp = data.data;
 
+  // Parcours des données à mettre à jour
   data_tmp.forEach((el) => {
+    // Vérification de la catégorie automatique
     if (el.id_cat_automatica !== null) {
-      el.title_cat = categories[el.id_cat_automatica].title;
-      el.id_cat = categories[el.id_cat_automatica].id;
+      // Mise à jour du titre de catégorie et de l'ID de catégorie
+      el.title_cat = categories.find(
+        (cat) => cat.id === el.id_cat_automatica
+      ).title;
+      el.id_cat = categories.find((cat) => cat.id === el.id_cat_automatica).id;
     } else if (el.id_cat !== null) {
-      el.title_cat = categories[el.id_cat].title;
+      // Mise à jour du titre de catégorie
+      el.title_cat = categories.find((cat) => cat.id === el.id_cat).title;
+    } else {
+      // Aucune catégorie correspondante, titre vide
+      el.title_cat = "";
     }
   });
 }
@@ -462,6 +472,7 @@ function load_manually_reseller_category() {
   fetch("backend.php?page=management")
     .then((response) => response.json())
     .then((data) => {
+      console.debug(data);
       // Désactive l'édition de la colonne "title_cat"
       editColumnProperties("title_cat", {
         editable: false,
@@ -480,16 +491,16 @@ function load_manually_reseller_category() {
         cellStyle: function getStatusCellStyle(params) {
           const status = params.value;
 
-          if (status === "open") {
-            return { backgroundColor: "lightgreen", color: "black" };
-          } else if (status === "working") {
-            return { backgroundColor: "orange", color: "black" };
-          } else if (status === "completed") {
-            return { backgroundColor: "lightgray", color: "black" };
+          switch (status) {
+            case "open":
+              return { backgroundColor: "lightgreen", color: "black" };
+            case "working":
+              return { backgroundColor: "orange", color: "black" };
+            case "completed":
+              return { backgroundColor: "lightgray", color: "black" };
+            default:
+              return null; // Valeur par défaut si aucune condition n'est satisfaite
           }
-
-          // Style par défaut pour les autres valeurs
-          return null;
         },
       });
 

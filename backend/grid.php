@@ -1,7 +1,7 @@
 <?php
 namespace grid;
 
-require 'db.php';
+require_once 'db.php';
 
 /**
  * Récupère les données des revendeurs et des catégories depuis la base de données.
