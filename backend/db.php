@@ -329,24 +329,24 @@ function get_log_by_id($id)
 
 
 /**
- * Enregistre un journal dans la table log.
+ * Insère un enregistrement dans la table "log" avec les informations fournies.
  *
- * @param string $status - Le statut du journal.
- * @param int $initiator - L'initiateur du journal.
- * @param int $objectToLog - L'objet à journaliser.
- *
- * @return bool - Retourne true si l'enregistrement est réussi, sinon false.
+ * @param string $status - Le statut de l'enregistrement.
+ * @param int $initiator - L'initiateur de l'action.
+ * @param int $objectToLog - L'objet à enregistrer.
+ * @param string $newData - Les nouvelles données au format JSON.
+ * @return bool - Retourne true si l'insertion est réussie, sinon false en cas d'erreur.
  */
-function set_log($status, $initiator, $objectToLog)
+function set_log($status, $initiator, $objectToLog, $newData)
 {
     global $mysqli;
 
-    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime) VALUES (?, ?, ?, NOW())";
+    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime, newData) VALUES (?, ?, ?, NOW(), ?)";
 
     try {
         // Vérifie si l'enregistrement existe
         $stmt = $mysqli->prepare($updateSql);
-        $stmt->bind_param("sii", $status, $objectToLog, $initiator);
+        $stmt->bind_param("siis", $status, $objectToLog, $initiator, $newData);
         $stmt->execute();
         $stmt->close();
 

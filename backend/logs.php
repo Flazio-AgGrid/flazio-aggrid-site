@@ -44,9 +44,9 @@ function get_log_by_id($id)
  * @param int $objectToLog L'objet à enregistrer dans le log.
  * @return bool True si le log est enregistré avec succès, sinon false.
  */
-function set_log($status, $initiator, $objectToLog)
+function set_log($status, $initiator, $objectToLog, $newData)
 {
-    if (\db\set_log($status, $initiator, $objectToLog)) {
+    if (\db\set_log($status, $initiator, $objectToLog, $newData)) {
         return true;
     }
     else {

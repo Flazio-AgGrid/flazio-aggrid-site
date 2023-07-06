@@ -362,6 +362,7 @@ function saveChangesToBackend() {
  * @param {Object} data - Les données modifiées à envoyer.
  */
 function saveChangesToBackendAuto(data) {
+  console.log(data);
   let php_user = getCookie("PHP_USER");
   if (php_user === null) {
     createNotification(`Please log in!`);
@@ -374,13 +375,13 @@ function saveChangesToBackendAuto(data) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data_tmp, initiator: php_user }),
+    body: JSON.stringify({ modifiedData: data, initiator: php_user }),
   })
     .then((response) => response.json())
     .then((result) => {
       console.debug(result); // Affiche la réponse du backend
       result.messages.map((el) => createNotification(el.message));
-      majDataFront("management");
+      //majDataFront("management");
     })
     .catch((error) => {
       console.error("Erreur lors de l'envoi des données au backend:", error);
@@ -420,7 +421,7 @@ function majDataFront(mode) {
       // Ajuste la taille des colonnes
       autoSizeAll();
 
-      // Ferme le panneau d'outils de la grille
+      // // Ferme le panneau d'outils de la grille
       gridOptions.api.closeToolPanel();
     })
     .catch((error) => {

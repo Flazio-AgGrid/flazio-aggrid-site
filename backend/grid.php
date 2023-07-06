@@ -68,7 +68,7 @@ function update_reseller_category()
         $count  = \db\get_verify_fk_lead_exists($row, $id, $id_cat);
 
         if ($count > 0) {
-            \log\set_log('updated', $modifiedData['initiator'], $id);
+            \log\set_log('updated', $modifiedData['initiator'], $id, json_encode(array("id_cat" => $id_cat)));
 
             \db\update_fk_lead($id, $id_cat);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
@@ -76,7 +76,7 @@ function update_reseller_category()
         else {
             $tableau = \db\get_adress_reseller($id);
 
-            \log\set_log('updated', $modifiedData['initiator'], $id);
+            \log\set_log('updated', $modifiedData['initiator'], $id, json_encode(array("id_cat" => $id_cat)));
 
             \db\set_fake_maps_info($tableau);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
@@ -152,7 +152,7 @@ function update_manually_reseller_category()
     $id           = $row["id"];
     $lead_status  = $row['lead_status'];
 
-    \log\set_log('updated', $modifiedData['initiator'], $id);
+    \log\set_log('updated', $modifiedData['initiator'], $id, json_encode(array("lead_status" => $lead_status)));
 
     if (\db\update_status_lead($id, $lead_status)) {
         array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id, "data" => $id . "&" . $lead_status));
