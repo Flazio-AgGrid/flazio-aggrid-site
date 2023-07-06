@@ -1,43 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Authentification</title>
+</head>
+
+<body>
+  <h2>Authentification</h2>
+  <form method="POST" action="login.php">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required><br>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br>
+    <input type="submit" value="Login">
+    <a href="registration.php">Registration</a>
+  </form>
+</body>
+
+</html>
+
 <?php
+require_once '../backend/db.php';
+
+session_start();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Récupérer les données du formulaire de connexion
   $username = $_POST['username'];
   $password = $_POST['password'];
 
-  // Connexion à la base de données
-  $servername  = "localhost";
-  $db_username = "root";
-  $db_password = "";
-  $db_name     = "reseller_experience";
+  // Vérifier si la connexion à la base de données est établie
+  if (isset($mysqli) && $mysqli instanceof mysqli) {
+    // Appeler la fonction pour obtenir les informations de l'utilisateur
+    $result = db\get_username($username);
 
-  $conn = new mysqli($servername, $db_username, $db_password, $db_name);
+    // Vérifier si l'utilisateur existe dans la base de données
+    if ($result && $result->num_rows == 1) {
+      $row                  = $result->fetch_assoc();
+      $hashedPasswordFromDB = $row['password'];
 
-  // Vérification des informations d'identification
-  $query  = "SELECT * FROM users WHERE username='$username'";
-  $result = $conn->query($query);
-
-  if ($result->num_rows == 1) {
-    $row                  = $result->fetch_assoc();
-    $hashedPasswordFromDB = $row['password'];
-
-    // Vérifier si le mot de passe fourni correspond au hachage stocké
-    if (password_verify($password, $hashedPasswordFromDB)) {
-      // Authentification réussie
-      session_start();
-      $_SESSION['authenticated'] = true;
-      http_response_code(200); // OK
-      header('Location: ../index.php');
+      // Vérifier si le mot de passe fourni correspond au hachage stocké
+      if (password_verify($password, $hashedPasswordFromDB)) {
+        // Authentification réussie
+        $_SESSION['authenticated'] = true;
+        header('Location: ../index.php');
+        exit;
+      }
+      else {
+        // Mot de passe incorrect
+        echo 'Mot de passe incorrect.';
+      }
     }
     else {
-      // Authentification échouée
-      http_response_code(401); // Unauthorized
+      // Nom d'utilisateur incorrect
+      echo 'Nom d\'utilisateur incorrect.';
     }
   }
   else {
-    // Authentification échouée
-    http_response_code(401); // Unauthorized
+    // Erreur de connexion à la base de données
+    echo 'Erreur de connexion à la base de données.';
   }
-
-  $conn->close();
 }
 ?>
