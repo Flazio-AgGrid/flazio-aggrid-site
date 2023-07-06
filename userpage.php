@@ -15,44 +15,63 @@
 
 <body>
     <div id="page">
-        <div class="table_all_user">
-            <?php
-            require_once './backend/db.php';
-            // Appeler la fonction pour obtenir les informations de l'utilisateur
-            $result = \db\get_userpage();
+        <div class="box_table_all_user">
+            <h1 class="title_box">User Management Menu</h1>
+            <div class="table_all_user">
+                <?php
+                require_once './backend/db.php';
+                // Appeler la fonction pour obtenir les informations de l'utilisateur
+                $result = \db\get_userpage();
 
-            if ($result->num_rows > 0) {
-                // Affichage du tableau
-                echo "<table>
-            <tr>
-                <th>Nom</th>
-                <th>Date de dernière connexion</th>
-                <th>En ligne/Hors ligne</th>
-                <th>Profil actif/Non actif</th>
-                <th>ID</th>
+                if ($result->num_rows > 0) {
+                    // Affichage du tableau
+                    echo "<table>
+                <tr>
+                <th><h2>Name</h2></th>
+                <th><h2>Status</h2></th>
+                <th><h2>Last Connection</h2></th>
+                <th><h2>ID</h2></th>
             </tr>";
 
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>
                 <td>" . $row["username"] . "</td>
-                <td>" . $row["last_connection"] . "</td>
                 <td>" . $row["online"] . "</td>
-                <td>" . $row["active_profile"] . "</td>
+                <td>" . $row["last_connection"] . "</td>
                 <td>" . $row["id"] . "</td>
+                
             </tr>";
+                    }
+                    echo "</table>";
+                } else {
+                    echo "Aucun utilisateur trouvé dans la base de données.";
                 }
-                echo "</table>";
-            } else {
-                echo "Aucun utilisateur trouvé dans la base de données.";
-            }
 
-            // Fermeture de la connexion à la base de données
-            $mysqli->close();
-            ?>
+                // Fermeture de la connexion à la base de données
+                $mysqli->close();
+                ?>
+            </div>
         </div>
 
-        <div class="profil_user">
-            <p>dzezf</p>
+        <div class="box_user_management">
+            <h1 class="title_box">User Management Menu</h1>
+            <div class="box_user_management_content">
+
+                <input placeholder="Username" class="input" name="text" type="text">
+
+                <input placeholder="Password" class="input" name="text" type="text">
+            
+
+            </div>
+
+            <div class="box_user_management_content">
+
+            <button>Save</button> 
+
+            <button>Enabled/ <br> Disabled</button>
+
+            </div>
+
         </div>
 
     </div>
