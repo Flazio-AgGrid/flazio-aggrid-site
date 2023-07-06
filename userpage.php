@@ -19,7 +19,7 @@
             <?php
             require_once './backend/db.php';
             // Appeler la fonction pour obtenir les informations de l'utilisateur
-            $result = \db\get_userpage();
+            $result = \db\get_userinfo();
 
             if ($result->num_rows > 0) {
                 // Affichage du tableau
@@ -42,7 +42,8 @@
             </tr>";
                 }
                 echo "</table>";
-            } else {
+            }
+            else {
                 echo "Aucun utilisateur trouvé dans la base de données.";
             }
 
