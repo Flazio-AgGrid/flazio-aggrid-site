@@ -25,8 +25,7 @@ function get_reseller()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -45,8 +44,7 @@ function get_category()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -76,8 +74,7 @@ function get_verify_fk_lead_exists($row, $id, $id_cat)
         $stmt->close();
 
         return $count;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -101,8 +98,7 @@ function update_fk_lead($id, $id_cat)
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -120,11 +116,10 @@ function get_adress_reseller($id)
     $query = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
 
     try {
-        $result          = $mysqli->query($query);
+        $result = $mysqli->query($query);
         $tableau_adresse = $result->fetch_all();
         return $tableau_adresse;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -143,18 +138,18 @@ function set_fake_maps_info($tableau)
 
     try {
         foreach ($tableau as $row) {
-            $fk_lead           = $row[0];
-            $jsondata          = json_encode(
+            $fk_lead = $row[0];
+            $jsondata = json_encode(
                 array(
-                    "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
+                    "formatted_address" => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
                     "formatted_phone_number" => "123 xxx 6789",
-                    "name"                   => "Example",
-                    "website"                => "http://www.example.it/"
+                    "name" => "Example",
+                    "website" => "http://www.example.it/"
                 )
             );
-            $website           = "example.it";
-            $warning           = rand(0, 1);
-            $id_cat            = null;
+            $website = "example.it";
+            $warning = rand(0, 1);
+            $id_cat = null;
             $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
 
             $stmt = $mysqli->prepare($query);
@@ -163,8 +158,7 @@ function set_fake_maps_info($tableau)
         }
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -181,13 +175,12 @@ function get_username($username)
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL
         $query = "SELECT username, password, id FROM users WHERE username = ?";
-        $stmt  = $mysqli->prepare($query);
+        $stmt = $mysqli->prepare($query);
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -213,8 +206,7 @@ function set_register($username, $hashedPassword)
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -233,8 +225,7 @@ function get_reseller_set_manually()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -253,8 +244,7 @@ function get_status()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -274,8 +264,23 @@ function update_status_lead($id, $lead_status)
         $stmt->close();
 
         return true;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
     }
-    catch (\Throwable $th) {
+}
+
+function get_userpage()
+{
+    global $mysqli;
+
+    // Récupération des utilisateurs depuis la base de données
+    $query = "SELECT username, last_connection, online, active_profile, id FROM users";
+
+    try {
+        $result_data = $mysqli->query($query);
+        return $result_data;
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
