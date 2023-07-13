@@ -5,6 +5,7 @@ export type Rootstate = {
   columnDefs: ColumnDef[];
   rowData: RowData[];
   categoryData: CategoryData[];
+  changeRowData: RowData[];
 };
 
 export const useDataStore = defineStore("data", {
@@ -296,6 +297,7 @@ export const useDataStore = defineStore("data", {
         },
       ],
       categoryData: [
+        { id: "", title: "" },
         { id: "1", title: "Advertising" },
         { id: "2", title: "Blog" },
         { id: "3", title: "Booking" },
@@ -308,40 +310,88 @@ export const useDataStore = defineStore("data", {
         { id: "10", title: "Restaurant" },
         { id: "11", title: "Services" },
       ],
+      changeRowData: [],
     } as Rootstate),
   getters: {
-    getColumnDefs: (state): ColumnDef[] => state.columnDefs,
-    getRowData: (state): RowData[] => state.rowData,
-    getCategoryData: (state): CategoryData[] => state.categoryData,
+    getColumnDefs: (state: Rootstate): ColumnDef[] => state.columnDefs,
+    getRowData: (state: Rootstate): RowData[] => state.rowData,
+    getCategoryData: (state: Rootstate): CategoryData[] => state.categoryData,
+    getChangeRowData: (state: Rootstate): RowData[] => state.changeRowData,
   },
   actions: {
+    /**
+     * Définit les titre des colonnes.
+     * @param {ColumnDef[]} columnDefs - Les définitions de colonnes à définir.
+     */
     setColumnDefs(columnDefs: ColumnDef[]) {
       this.columnDefs = columnDefs;
     },
+
+    /**
+     * Définit les données de chaque lignes.
+     * @param {RowData[]} rowData - Les données de lignes à définir.
+     */
     setRowData(rowData: RowData[]) {
       this.rowData = rowData;
     },
+
+    /**
+     * Définit les données dans la selection des catégories.
+     * @param {CategoryData[]} categoryData - Les données de catégories à définir.
+     */
     setCategoryData(categoryData: CategoryData[]) {
       this.categoryData = categoryData;
     },
+
+    /**
+     * Met à jour les données modifiées dans le tableau changeRowData.
+     * Si la ligne existe déjà dans changeRowData, elle est mise à jour.
+     * Sinon, la ligne est ajoutée au tableau.
+     * @param {RowData} row - La ligne de données à mettre à jour.
+     */
+    setChangeRowData(row: RowData): boolean {
+      try {
+        const index = this.changeRowData.findIndex((el) => el.id === row.id);
+        if (index >= 0) {
+          // Mettre à jour la ligne existante
+          this.changeRowData[index] = row;
+        } else {
+          // Ajouter la nouvelle ligne
+          this.changeRowData.push(row);
+        }
+        return true;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    },
+
+    /**
+     * Définit les paramètres de l'éditeur de cellules pour la colonne "title_cat".
+     */
     setCellEditorParams() {
-      const titleCategoryData: string[] = [];
-      this.categoryData.map((el) => titleCategoryData.push(el.title));
-      this.columnDefs.forEach((columnDef) => {
-        if (columnDef.field === "title_cat") {
-          if (columnDef.cellEditorParams)
-            columnDef.cellEditorParams.values = titleCategoryData;
+      const titleCategoryData: CategoryData["title"][] = [];
+      this.categoryData.forEach((el: CategoryData) =>
+        titleCategoryData.push(el.title)
+      );
+      this.columnDefs.forEach((columnDef: ColumnDef) => {
+        if (columnDef.field === "title_cat" && columnDef.cellEditorParams) {
+          columnDef.cellEditorParams.values = titleCategoryData;
         }
       });
     },
-    updateIdCat(): void {
+
+    /**
+     * Met à jour la valeur de la colonne "id_cat" en fonction de la valeur de "id_cat_automatica".
+     */
+    updateIdCat() {
       const newRowData: RowData[] = this.rowData.map((el: RowData) => {
         if (el.id_cat_automatica) {
           el.id_cat = el.id_cat_automatica;
-          const title_cat: CategoryData = this.categoryData.filter(
-            (cat) => cat.id == el.id_cat_automatica
-          )[0];
-          el.title_cat = title_cat.title;
+          const title_cat: CategoryData | undefined = this.categoryData.find(
+            (cat: CategoryData) => cat.id === el.id_cat_automatica
+          );
+          el.title_cat = title_cat?.title || "";
         } else {
           el.id_cat = "";
         }

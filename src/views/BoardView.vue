@@ -1,24 +1,36 @@
 <!-- eslint-disable vue/attribute-hyphenation -->
 <template>
-  <div>
-    <h1>Board</h1>
+  <TextWelcomeLayout>
     <ag-grid-vue
-      class="ag-theme-alpine fullscreen"
+      class="fullscreen"
+      :class="theme"
       :columnDefs="columnDefs"
       :rowData="rowData"
+      :gridOptions="gridOptions"
       singleClickEdit="true"
       stopEditingWhenCellsLoseFocus="true"
       enterNavigatesVerticallyAfterEdit="true"
       rowSelection="multiple"
+      @cellValueChanged="onCellValueChanged"
     >
     </ag-grid-vue>
-  </div>
+    <div id="buttonArea" style="position: fixed; bottom: 10px; right: 20px">
+      <el-button type="primary">Load status</el-button>
+      <el-button type="success" v-if="changeRowData.length > 0">
+        Save change
+      </el-button>
+    </div>
+  </TextWelcomeLayout>
 </template>
 
 <script lang="ts">
+import TextWelcomeLayout from "@/components/layout/TextWelcomeLayout.vue";
+import { RowData, ColumnDef } from "@/models/DataStore.models";
 import { AgGridVue } from "ag-grid-vue3";
 import { useDataStore } from "@/store/data";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch, Ref } from "vue";
+import { CellValueChangedEvent, GridApi, ColumnApi } from "ag-grid-community";
+import { isDark } from "@/utils";
 
 export default {
   name: "App",
@@ -27,16 +39,59 @@ export default {
   },
   setup() {
     const dataStore = useDataStore();
-    const columnDefs = ref(dataStore.getColumnDefs);
-    const rowData = ref(dataStore.getRowData);
+    const columnDefs: Ref<ColumnDef[]> = ref(dataStore.getColumnDefs);
+    const rowData: Ref<RowData[]> = ref(dataStore.getRowData);
+    const changeRowData: Ref<RowData[]> = ref(dataStore.getChangeRowData);
+
+    const gridOptions = {
+      defaultColDef: {
+        enableValue: true,
+        enableRowGroup: true,
+        enablePivot: true,
+        sortable: true,
+        filter: true,
+        resizable: true,
+      },
+      sideBar: true,
+      api: new GridApi(),
+      columnApi: new ColumnApi(),
+    };
+
+    const theme: Ref<string> = ref("ag-theme-alpine");
+
+    const autoSizeAll = (skipHeader = false) => {
+      gridOptions.columnApi.autoSizeAllColumns(skipHeader);
+      gridOptions.api.closeToolPanel();
+    };
 
     onMounted(() => {
       dataStore.setCellEditorParams();
       dataStore.updateIdCat();
+      autoSizeAll();
+      updateTheme(isDark.value); // Appel initial pour définir le thème
     });
+
+    const onCellValueChanged = (params: CellValueChangedEvent) => {
+      dataStore.setChangeRowData(params.data);
+    };
+
+    watch(isDark, (newVal) => {
+      updateTheme(newVal); // Mettre à jour le thème en fonction de la nouvelle valeur de isDark
+    });
+
+    const updateTheme = (darkMode: boolean) => {
+      theme.value = darkMode ? "ag-theme-alpine-dark" : "ag-theme-alpine";
+    };
+
     return {
+      TextWelcomeLayout,
       columnDefs,
       rowData,
+      changeRowData,
+      gridOptions,
+      onCellValueChanged,
+      theme,
+      isDark,
     };
   },
 };
@@ -44,6 +99,6 @@ export default {
 
 <style scoped>
 .fullscreen {
-  height: 90vh;
+  height: 75vh;
 }
 </style>

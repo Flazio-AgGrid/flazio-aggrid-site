@@ -23,6 +23,7 @@ export interface RowData {
   id_cat: string | null;
   id_cat_automatica: string | null;
   title_cat?: string;
+  lead_status_cat?: string | number;
 }
 
 export interface ColumnDef {

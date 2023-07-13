@@ -12,6 +12,7 @@
     "@element-plus/icons-vue": "^2.1.0",
     "@vueuse/core": "^10.2.1",
     "ag-grid-community": "^30.0.2",
+    "ag-grid-enterprise": "^30.0.3",
     "ag-grid-vue3": "^30.0.2",
     "core-js": "^3.8.3",
     "element-plus": "^2.3.7",
@@ -53,7 +54,10 @@
       "parser": "@typescript-eslint/parser",
       "ecmaVersion": 2020
     },
-    "plugins": ["vue", "@typescript-eslint"],
+    "plugins": [
+      "vue",
+      "@typescript-eslint"
+    ],
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/eslint-recommended",

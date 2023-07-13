@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <TextWelcomeLayout>
     <h2>Registration</h2>
     <el-form @submit.native.prevent="register">
       <el-form-item label="Username">
@@ -11,10 +11,11 @@
       <el-button type="primary" native-type="submit">Register</el-button>
       <router-link to="/login">Login</router-link>
     </el-form>
-  </div>
+  </TextWelcomeLayout>
 </template>
 
 <script lang="ts">
+import TextWelcomeLayout from "@/components/layout/TextWelcomeLayout.vue";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -54,6 +55,7 @@ export default defineComponent({
     };
 
     return {
+      TextWelcomeLayout,
       username,
       password,
       register,
