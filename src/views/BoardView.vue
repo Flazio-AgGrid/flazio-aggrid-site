@@ -15,8 +15,11 @@
     >
     </ag-grid-vue>
     <div id="buttonArea" style="position: fixed; bottom: 10px; right: 20px">
-      <el-button type="primary">Load status</el-button>
-      <el-button type="success" v-if="changeRowData.length > 0">
+      <el-button type="primary" @click="load">Load status</el-button>
+      <el-button
+        type="success"
+        v-if="modeStatusEdit && changeRowData.length > 0"
+      >
         Save change
       </el-button>
     </div>
@@ -42,7 +45,7 @@ export default {
     const columnDefs: Ref<ColumnDef[]> = ref(dataStore.getColumnDefs);
     const rowData: Ref<RowData[]> = ref(dataStore.getRowData);
     const changeRowData: Ref<RowData[]> = ref(dataStore.getChangeRowData);
-
+    const modeStatusEdit: Ref<boolean> = ref(true);
     const gridOptions = {
       defaultColDef: {
         enableValue: true,
@@ -67,14 +70,24 @@ export default {
     onMounted(() => {
       dataStore.setCellEditorParams();
       dataStore.updateIdCat();
+      dataStore.updateStatusCat();
       autoSizeAll();
       updateTheme(isDark.value); // Appel initial pour définir le thème
     });
 
     const onCellValueChanged = (params: CellValueChangedEvent) => {
       dataStore.setChangeRowData(params.data);
+      autoSizeAll();
     };
 
+    const load = () => {
+      dataStore.setColumnDefStatusHide();
+      modeStatusEdit.value = !modeStatusEdit.value;
+      autoSizeAll();
+    };
+    /*
+     *   Theme sombre Ag-Grid
+     */
     watch(isDark, (newVal) => {
       updateTheme(newVal); // Mettre à jour le thème en fonction de la nouvelle valeur de isDark
     });
@@ -88,10 +101,12 @@ export default {
       columnDefs,
       rowData,
       changeRowData,
+      modeStatusEdit,
       gridOptions,
       onCellValueChanged,
       theme,
       isDark,
+      load,
     };
   },
 };

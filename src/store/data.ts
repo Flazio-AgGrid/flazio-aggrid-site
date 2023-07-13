@@ -1,4 +1,9 @@
-import { RowData, ColumnDef, CategoryData } from "@/models/DataStore.models";
+import {
+  RowData,
+  ColumnDef,
+  CategoryData,
+  StatusData,
+} from "@/models/DataStore.models";
 import { defineStore } from "pinia";
 //import { useStorage } from "@vueuse/core";
 export type Rootstate = {
@@ -6,6 +11,7 @@ export type Rootstate = {
   rowData: RowData[];
   categoryData: CategoryData[];
   changeRowData: RowData[];
+  statusData: StatusData[];
 };
 
 export const useDataStore = defineStore("data", {
@@ -41,6 +47,32 @@ export const useDataStore = defineStore("data", {
           cellEditor: "agSelectCellEditor",
           cellEditorParams: {
             values: [],
+          },
+          hide: false,
+        },
+        {
+          field: "title_status_cat",
+          headerName: "Status Choice",
+          editable: true,
+          pinned: "right",
+          cellEditor: "agRichSelectCellEditor",
+          cellEditorParams: {
+            values: [],
+          },
+          hide: true,
+          cellStyle: (params: { value: never }) => {
+            const status = params.value;
+
+            switch (status) {
+              case "open":
+                return { backgroundColor: "lightgreen", color: "black" };
+              case "working":
+                return { backgroundColor: "orange", color: "black" };
+              case "completed":
+                return { backgroundColor: "lightgray", color: "black" };
+              default:
+                return null; // Valeur par défaut si aucune condition n'est satisfaite
+            }
           },
         },
       ],
@@ -310,6 +342,12 @@ export const useDataStore = defineStore("data", {
         { id: "10", title: "Restaurant" },
         { id: "11", title: "Services" },
       ],
+      statusData: [
+        { id: "", title: "" },
+        { id: "1", title: "open" },
+        { id: "2", title: "working" },
+        { id: "3", title: "completed" },
+      ],
       changeRowData: [],
     } as Rootstate),
   getters: {
@@ -371,12 +409,24 @@ export const useDataStore = defineStore("data", {
      */
     setCellEditorParams() {
       const titleCategoryData: CategoryData["title"][] = [];
+      const titleStatusData: StatusData["title"][] = [];
+
       this.categoryData.forEach((el: CategoryData) =>
         titleCategoryData.push(el.title)
       );
+
+      this.statusData.forEach((el: StatusData) =>
+        titleStatusData.push(el.title)
+      );
+
       this.columnDefs.forEach((columnDef: ColumnDef) => {
         if (columnDef.field === "title_cat" && columnDef.cellEditorParams) {
           columnDef.cellEditorParams.values = titleCategoryData;
+        } else if (
+          columnDef.field === "title_status_cat" &&
+          columnDef.cellEditorParams
+        ) {
+          columnDef.cellEditorParams.values = titleStatusData;
         }
       });
     },
@@ -398,6 +448,36 @@ export const useDataStore = defineStore("data", {
         return el;
       });
       this.rowData = newRowData;
+    },
+
+    updateStatusCat() {
+      const newRowData: RowData[] = this.rowData.map((el: RowData) => {
+        if (el.lead_status_cat === null) {
+          el.lead_status_cat = 1;
+        }
+        const title_status_cat: StatusData | undefined = this.statusData.find(
+          (sta: StatusData) => sta.id === el.lead_status_cat
+        );
+        el.title_status_cat = title_status_cat?.title || "";
+        return el;
+      });
+      this.rowData = newRowData;
+    },
+
+    setColumnDefStatusHide(): boolean {
+      const status_cat: ColumnDef | undefined = this.columnDefs.find(
+        (el: ColumnDef) => el.field == "title_status_cat"
+      );
+      const title_cat: ColumnDef | undefined = this.columnDefs.find(
+        (el: ColumnDef) => el.field == "title_cat"
+      );
+      if (status_cat && title_cat) {
+        status_cat.hide = !status_cat.hide;
+        title_cat.hide = !title_cat.hide;
+        return true;
+      } else {
+        return false;
+      }
     },
   },
 });

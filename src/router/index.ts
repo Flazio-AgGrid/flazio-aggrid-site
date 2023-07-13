@@ -30,6 +30,12 @@ const routes: Array<RouteRecordRaw> = [
     component: BoardView,
     meta: { requiresAuth: true }, // Authentification requise pour cette page
   },
+  {
+    path: "/board",
+    name: "board",
+    component: BoardView,
+    meta: { requiresAuth: true }, // Authentification requise pour cette page
+  },
 ];
 
 const router = createRouter({

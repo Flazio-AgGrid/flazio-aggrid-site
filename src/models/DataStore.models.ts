@@ -24,6 +24,7 @@ export interface RowData {
   id_cat_automatica: string | null;
   title_cat?: string;
   lead_status_cat?: string | number;
+  title_status_cat?: string;
 }
 
 export interface ColumnDef {
@@ -36,9 +37,16 @@ export interface ColumnDef {
   cellEditorParams?: {
     values: string[];
   };
+  hide?: boolean;
+  cellStyle?: { backgroundColor: string; color: string } | null;
 }
 
 export interface CategoryData {
+  id: string;
+  title: string;
+}
+
+export interface StatusData {
   id: string;
   title: string;
 }
