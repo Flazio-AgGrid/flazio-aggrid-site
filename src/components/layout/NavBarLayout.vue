@@ -8,10 +8,13 @@
     <p style="margin-right: 20px">{{ title }}</p>
     <el-menu-item index="/">Home</el-menu-item>
     <el-menu-item v-if="isAuth" index="/board">Finance</el-menu-item>
+    <el-menu-item v-if="isAuth" index="/settings">Settings</el-menu-item>
     <div class="flex-grow" />
-    <el-menu-item @click="toggleD">{{
-      isDark ? "Light" : "Dark"
-    }}</el-menu-item>
+    <el-menu-item @click="toggleD">
+      <el-icon v-if="isDark"><Sunny /></el-icon>
+      <el-icon v-else><Moon /></el-icon>
+      {{ isDark ? "Light" : "Dark" }}
+    </el-menu-item>
     <el-menu-item index="/login">{{
       isAuth ? "Logout" : "Login"
     }}</el-menu-item>

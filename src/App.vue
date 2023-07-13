@@ -4,6 +4,7 @@
       <NavBarLayout title="Mon Titre">
         <RouterLink to="/">Home</RouterLink> |
         <RouterLink to="/login">Login</RouterLink>
+        <RouterLink to="/settings">Settings</RouterLink>
       </NavBarLayout>
     </el-header>
 

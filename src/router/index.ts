@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import LoginView from "../views/LoginView.vue";
-import RegistrationView from "../views/RegistrationView.vue";
-import BoardView from "../views/BoardView.vue";
+import HomeView from "@/views/HomeView.vue";
+import LoginView from "@/views/LoginView.vue";
+import RegistrationView from "@/views/RegistrationView.vue";
+import BoardView from "@/views/BoardView.vue";
+import SettingsView from "@/views/SettingsView.vue";
 import { useUserStore } from "@/store/user";
 
 const routes: Array<RouteRecordRaw> = [
@@ -31,9 +32,9 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }, // Authentification requise pour cette page
   },
   {
-    path: "/board",
-    name: "board",
-    component: BoardView,
+    path: "/settings",
+    name: "settings",
+    component: SettingsView,
     meta: { requiresAuth: true }, // Authentification requise pour cette page
   },
 ];

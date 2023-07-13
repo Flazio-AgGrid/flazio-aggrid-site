@@ -1,7 +1,6 @@
 <template>
   <TextWelcomeLayout>
-    <h2>Login</h2>
-    <el-form @submit.native.prevent="login">
+    <el-form @submit.native.prevent="login" label-width="120px">
       <el-form-item label="Username">
         <el-input v-model="username" required></el-input>
       </el-form-item>
@@ -9,7 +8,9 @@
         <el-input v-model="password" type="password" required></el-input>
       </el-form-item>
       <el-button type="primary" native-type="submit">Login</el-button>
-      <router-link to="/registration">Register</router-link>
+      <router-link to="/registration" style="margin-left: 12px">
+        <el-button> Register </el-button>
+      </router-link>
     </el-form>
   </TextWelcomeLayout>
 </template>
