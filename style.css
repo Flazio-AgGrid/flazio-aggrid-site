@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap'); 
+
 body {
     margin: 0;
     padding: 0;
     background: #e6e6e6;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     color: #000000;
     font-size: 1.5vw;
 
@@ -28,7 +30,6 @@ h3 {
     background: #e6e6e6;
     box-shadow: 9px 9px 18px #c4c4c4,
         -9px -9px 18px #ffffff;
-    transition: all 0.5s ease-in-out;
     align-items: center;
     text-align: center;
     height: 100%;
@@ -40,13 +41,7 @@ h3 {
     height: 100%;
 }
 
-.box_table_all_user:hover {
-    box-shadow: 9px 9px 18px #969696,
-        -9px -9px 18px #fff;
-    transition: 0.5s;
-    transform: scale(1.01);
 
-}
 
 table {
     width: 100%;
@@ -67,20 +62,10 @@ table {
     align-items: center;
     justify-content: center;
     text-align: center;
-    transition: all 0.5s ease-in-out;
 }
 
-.box_user_management:hover {
-    box-shadow: 9px 9px 18px #969696,
-        -9px -9px 18px #fff;
-    transition: 0.5s;
-    transform: scale(1.015);
-}
 
-.box_user_management_content {
-    display: flex;
-    justify-content: space-around;
-}
+
 
 .title_box {
     margin: 4vh 3vh 2vh 3vh;
@@ -89,7 +74,32 @@ table {
 td {
     padding: 3vh 0vh 3vh 0vh;
     border-bottom: 1px solid #00000050;
+    position: relative;
 }
+
+.dot {
+    height: 1vh;
+    width: 1vh;
+    /* background-color: #; */
+    border-radius: 50%;
+    border: #000000 solid 0.5px;
+    display: inline-block;
+    margin-top: 5px;
+    vertical-align: bottom;
+}
+
+.header_box_user {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#button_box_user {
+    width: 8vh;
+    height: 7vh;
+    margin-top: 2vh;
+}
+
+
 
 /* ------------------------Form management user ------------------------------------- */
 
@@ -109,7 +119,7 @@ td {
 /* ------------------------Form management user ------------------------------------- */
 
 /* ------------------------Botton management user ------------------------------------- */
-button {
+.button_white {
     color: #090909;
     padding: 2%;
     width: 35%;
@@ -120,15 +130,72 @@ button {
     transition: all .3s;
     box-shadow: 6px 6px 12px #c5c5c5,
         -6px -6px 12px #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    margin: 3vh;
 }
 
-button:hover {
+.button_white:hover {
     border: 1px solid white;
+    box-shadow: 6px 6px 12px #a2a2a2,
+        -6px -6px 12px #ffffff;
 }
 
-button:active {
+.button_white:active {
     box-shadow: 4px 4px 12px #c5c5c5,
         -4px -4px 12px #ffffff;
 }
 
 /* ------------------------Botton management user ------------------------------------- */
+
+
+/* ------------------------ Modal ------------------------------------- */
+
+/* Styles pour la fenêtre modale */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: #ffffff70;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 40px;
+    border: 1px solid #888;
+    width: 300px;
+    height: 200px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ellipsis {
+    font-weight: bold;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* ------------------------ Modal ------------------------------------- */
+
+.no_data_error {
+    text-align: center;
+    align-items: center
+}

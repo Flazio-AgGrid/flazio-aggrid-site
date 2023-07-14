@@ -6,41 +6,46 @@ require_once 'db.php';
 /**
  * Récupère les informations de tous les utilisateurs depuis la base de données.
  *
- * @return string Les informations de tous les utilisateurs au format JSON.
+ * @return array | bool Les informations de tous les utilisateurs au format JSON.
  */
 function get_alluserinfo()
 {
     $alluserinfo = \db\get_alluserinfo();
-    $result      = array();
+    $result = array();
 
+    if ($alluserinfo) {
 
-    while ($row = $alluserinfo->fetch_assoc()) {
-        // Convertir le statut en chaîne de caractères lisible
-        $lastconnection = $row['lastconnection'];
-        $userId         = $row['id'];
-        $status         = "";
-        switch ($row['status']) {
-            case 0:
-                $status = 'connected';
-                break;
-            case 1:
-                $status = 'offline';
-                break;
-            case 2:
-                $status = 'actived';
-                break;
-            case 3:
-                $status = 'deactivated';
-                break;
+        while ($row = $alluserinfo->fetch_assoc()) {
+            // Convertir le statut en chaîne de caractères lisible
+            $lastconnection = $row['lastconnection'];
+            $userId = $row['id'];
+            $status = "";
+            switch ($row['status']) {
+                case 0:
+                    $status = 'connected';
+                    break;
+                case 1:
+                    $status = 'offline';
+                    break;
+                case 2:
+                    $status = 'actived';
+                    break;
+                case 3:
+                    $status = 'disabled';
+                    break;
+            }
+
+            // Les variables $status et $lastconnection ne sont pas utilisées ici, donc elles peuvent être supprimées.
+            array_push($result, array("userId" => $userId, "username" => $row['username'], "status" => array("titleStatus" => $status, "idStatus" => $row['status']), "lastConnection" => $lastconnection));
         }
 
-        // Les variables $status et $lastconnection ne sont pas utilisées ici, donc elles peuvent être supprimées.
 
-        array_push($result, array("userId" => $userId, "username" => $row['username'], "status" => $status, "lastConnexion" => $lastconnection));
+        // Retourner les données au format JSON
+        return $result;
+    } else {
+        return false;
     }
 
-    // Retourner les données au format JSON
-    return json_encode(array("data" => $result));
 }
 
 // Lorsque l'utilisateur se connecte avec succès
@@ -58,28 +63,31 @@ function login($username, $password)
     if ($userinfo) {
         while ($row = $userinfo->fetch_assoc()) {
             $hashedPasswordFromDB = $row['password'];
-            $userId               = $row['id'];
+            $userId = $row['id'];
 
             if (password_verify($password, $hashedPasswordFromDB)) {
-                // Authentification réussie
-                $_SESSION['authenticated'] = true;
+
 
                 $token = generateAuthToken();
 
                 // Générer un jeton d'authentification unique
                 $authToken = array("id" => $userId, "token" => $token);
 
-                // Enregistrer le jeton d'authentification dans un cookie
-                setcookie('authToken', json_encode($authToken), time() + 3600, '/');
                 // Enregistrer le jeton d'authentification
-                saveAuthToken($userId, $token);
+                if (saveAuthToken($userId, $token)) {
+                    // Enregistrer le jeton d'authentification dans un cookie
+                    setcookie('authToken', json_encode($authToken), time() + 3600, '/');
+                    // Authentification réussie
+                    $_SESSION['authenticated'] = true;
+                    header('Location: ../index.php');
+                } else {
+                    header('Location: ./erreur.php');
+                }
 
-                header('Location: ../index.php');
                 exit;
             }
         }
-    }
-    else {
+    } else {
         echo 'Erreur de connexion';
     }
 }
@@ -91,6 +99,7 @@ function login($username, $password)
  */
 function checkLogin()
 {
+    \db\checkOnline();
     // Vérifier si le cookie d'authentification existe
     if (isset($_COOKIE['authToken'])) {
         $authToken = json_decode($_COOKIE['authToken'], true);
@@ -98,15 +107,15 @@ function checkLogin()
         // Vérifier si le jeton d'authentification correspond à celui enregistré dans votre système
         if (validateAuthToken($authToken['id'], $authToken['token'])) {
             // Autoriser la connexion
+            \db\keepAlive($authToken['id']);
             return true;
-        }
-        else {
+        } else {
             // Refuser la connexion
+            \db\keepAlive($authToken['id']);
             removeAuthToken($authToken['id']);
             return false;
         }
-    }
-    else {
+    } else {
         // Le cookie d'authentification n'existe pas, l'utilisateur doit se connecter
         logout();
         return false;
@@ -152,8 +161,7 @@ function saveAuthToken($userId, $authToken)
 {
     if (\db\saveAuthToken($userId, $authToken)) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -169,8 +177,7 @@ function validateAuthToken($userId, $authToken)
 {
     if (\db\validateAuthToken($userId, $authToken)) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -185,11 +192,18 @@ function removeAuthToken($userId)
 {
     if (\db\saveAuthToken($userId, NULL)) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
 
+function modifiedStatus($userId, $statusId)
+{
+    if (\db\modifiedStatus($userId, $statusId)) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 ?>

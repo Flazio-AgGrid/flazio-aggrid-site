@@ -4717,7 +4717,7 @@ INSERT INTO `reseller_experience_customer` (`id`, `AccountID`, `TaxRegID`, `Nome
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) NOT NULL,
+  `username` varchar(255) NOT NULL UNIQUE,
   `password` varchar(255) NOT NULL,
   `status` int NOT NULL DEFAULT '3' COMMENT '0:''connected'';\r\n1:''offline'';\r\n2:''actived'' When a user is created or reactivated, he can connect;\r\n3:''deactivated'' When a user is deactivated, he cannot connect;',
   `lastconnection` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
