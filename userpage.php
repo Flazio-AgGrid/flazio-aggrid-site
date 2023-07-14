@@ -21,7 +21,7 @@
                 <?php
                 require_once './backend/db.php';
                 // Appeler la fonction pour obtenir les informations de l'utilisateur
-                $result = \db\get_userpage();
+                $result = \db\get_alluserinfo();
 
                 if ($result->num_rows > 0) {
                     // Affichage du tableau
@@ -31,7 +31,7 @@
                 <th><h2>Status</h2></th>
                 <th><h2>Last Connection</h2></th>
                 <th><h2>ID</h2></th>
-            </tr>";
+                </tr>";
 
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>
@@ -40,7 +40,7 @@
                 <td>" . $row["last_connection"] . "</td>
                 <td>" . $row["id"] . "</td>
                 
-            </tr>";
+                </tr>";
                     }
                     echo "</table>";
                 } else {
@@ -55,26 +55,21 @@
 
         <div class="box_user_management">
             <h1 class="title_box">User Management Menu</h1>
+
             <div class="box_user_management_content">
-
                 <input placeholder="Username" class="input" name="text" type="text">
-
                 <input placeholder="Password" class="input" name="text" type="text">
-            
-
             </div>
 
             <div class="box_user_management_content">
-
-            <button>Save</button> 
-
-            <button>Enabled/ <br> Disabled</button>
-
+                <button>Save</button>
+                <button>Enabled/ <br> Disabled</button>
             </div>
 
         </div>
 
     </div>
+
 
 </body>
 
