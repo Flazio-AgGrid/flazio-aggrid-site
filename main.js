@@ -58,6 +58,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Créer une instance de la grille avec les options spécifiées
   new agGrid.Grid(gridDiv, gridOptions);
 
+  createLogoutButton();
+  createSettingsButton();
   // Récupérer les données à partir du backend
   fetch("backend.php?page=index")
     .then((response) => response.json())
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
       autoSizeAll();
       gridOptions.api.closeToolPanel();
 
-      // Créer le bouton de gestion
+      // Créer le bouton de gestion des clients
       createManagementButton();
     })
     .catch((error) => {
@@ -173,11 +175,19 @@ function createSaveButton() {
   saveButton.textContent = "Save Changes";
   saveButton.style.padding = "10px";
   saveButton.style.margin = "5px";
-  saveButton.style.backgroundColor = "#007bff";
+  saveButton.style.backgroundColor = "#62F500";
   saveButton.style.color = "#fff";
   saveButton.style.border = "none";
   saveButton.style.borderRadius = "5px";
   saveButton.style.cursor = "pointer";
+
+  saveButton.addEventListener("mouseover", function () {
+    saveButton.style.backgroundColor = "#41A300";
+  });
+
+  saveButton.addEventListener("mouseout", function () {
+    saveButton.style.backgroundColor = "#62F500";
+  });
 
   saveButton.addEventListener("click", function () {
     saveChangesToBackend();
@@ -196,11 +206,19 @@ function createManagementButton() {
   managementButton.textContent = "Go to Management Page";
   managementButton.style.padding = "10px";
   managementButton.style.margin = "5px";
-  managementButton.style.backgroundColor = "#49a1ff";
+  managementButton.style.backgroundColor = "#007bff";
   managementButton.style.color = "#fff";
   managementButton.style.border = "none";
   managementButton.style.borderRadius = "5px";
   managementButton.style.cursor = "pointer";
+
+  managementButton.addEventListener("mouseover", function () {
+    managementButton.style.backgroundColor = "#004FA3";
+  });
+
+  managementButton.addEventListener("mouseout", function () {
+    managementButton.style.backgroundColor = "#007bff";
+  });
 
   managementButton.addEventListener("click", function () {
     load_manually_reseller_category();
@@ -210,6 +228,37 @@ function createManagementButton() {
   });
 
   buttonArea.appendChild(managementButton);
+}
+
+/**
+ * Crée un bouton "Settings" et l'ajoute au document.
+ */
+function createSettingsButton() {
+  const buttonArea = document.getElementById("buttonArea");
+  const createSettingsButton = document.createElement("button");
+  createSettingsButton.id = "bouttonSettings";
+  createSettingsButton.textContent = "Settings";
+  createSettingsButton.style.padding = "10px";
+  createSettingsButton.style.margin = "5px";
+  createSettingsButton.style.backgroundColor = "#B1B1B1";
+  createSettingsButton.style.color = "#fff";
+  createSettingsButton.style.border = "none";
+  createSettingsButton.style.borderRadius = "5px";
+  createSettingsButton.style.cursor = "pointer";
+
+  createSettingsButton.addEventListener("mouseover", function () {
+    createSettingsButton.style.backgroundColor = "#6E6E6E";
+  });
+
+  createSettingsButton.addEventListener("mouseout", function () {
+    createSettingsButton.style.backgroundColor = "#B1B1B1";
+  });
+
+  createSettingsButton.addEventListener("click", function () {
+    document.location.pathname = "userpage.php";
+  });
+
+  buttonArea.appendChild(createSettingsButton);
 }
 /**
  * Crée un bouton "Go to Set Category" et l'ajoute au document.
@@ -221,11 +270,19 @@ function createResetPageButton() {
   resetButton.textContent = "Go to Set Category";
   resetButton.style.padding = "10px";
   resetButton.style.margin = "5px";
-  resetButton.style.backgroundColor = "#49a1ff";
+  resetButton.style.backgroundColor = "#007bff";
   resetButton.style.color = "#fff";
   resetButton.style.border = "none";
   resetButton.style.borderRadius = "5px";
   resetButton.style.cursor = "pointer";
+
+  resetButton.addEventListener("mouseover", function () {
+    resetButton.style.backgroundColor = "#004FA3";
+  });
+
+  resetButton.addEventListener("mouseout", function () {
+    resetButton.style.backgroundColor = "#007bff";
+  });
 
   resetButton.addEventListener("click", function () {
     location.reload(); // Recharge la page pour réinitialiser son état par défaut
@@ -233,7 +290,38 @@ function createResetPageButton() {
 
   buttonArea.appendChild(resetButton);
 }
+/**
+ * Crée un bouton "Logout" et l'ajoute au document.
+ */
+function createLogoutButton() {
+  const buttonArea = document.getElementById("buttonArea");
+  const logoutButton = document.createElement("button");
+  logoutButton.id = "buttonLogout";
+  logoutButton.textContent = "Logout";
+  logoutButton.style.padding = "10px";
+  logoutButton.style.margin = "5px";
+  logoutButton.style.backgroundColor = "#FF5858";
+  logoutButton.style.color = "#fff";
+  logoutButton.style.border = "none";
+  logoutButton.style.borderRadius = "5px";
+  logoutButton.style.cursor = "pointer";
 
+  logoutButton.addEventListener("mouseover", function () {
+    logoutButton.style.backgroundColor = "#CC0000";
+  });
+
+  logoutButton.addEventListener("mouseout", function () {
+    logoutButton.style.backgroundColor = "#FF5858";
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    const logout = await fetch("backend.php?page=logout");
+    createNotification(logout ? "Successful logout" : "Failed logout");
+    document.location.pathname = "/auth/login.php";
+  });
+
+  buttonArea.appendChild(logoutButton);
+}
 /**
  * Redimensionne automatiquement toutes les colonnes de la grille.
  * @param {boolean} [skipHeader=false] - Indique si l'en-tête doit être exclu du redimensionnement.

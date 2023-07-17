@@ -4,7 +4,7 @@ session_start();
 
 require_once './backend/auth.php';
 // Vérifier si l'utilisateur est authentifié
-if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
+if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     // Rediriger vers une page d'erreur ou afficher un message d'erreur
     header('Location: ./auth/erreur.php');
     exit;
@@ -30,6 +30,9 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
 </head>
 
 <body>
+    <?php
+    // date_default_timezone_set("Europe/Paris");
+    echo  date('Y-m-d H:i:s'); ?>
     <div id="page">
         <div class="box_table_all_user">
 
@@ -55,19 +58,18 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
                     <th><h2>Last Connection</h2></th>
                     <th><h2>ID</h2></th>
                     <th><h2>Option</h2></th>
-                </tr>";
-
-
+                    </tr>";
 
                     foreach ($result as $row) {
                         $color_status = ""; // Variable pour stocker la couleur de fond
-                        $color = ""; // Variable pour stocker la couleur de l'élément dot
-                        $font_color = ""; // Variable pour stocker la couleur de la police
+                        $color        = ""; // Variable pour stocker la couleur de l'élément dot
+                        $font_color   = ""; // Variable pour stocker la couleur de la police
                 
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
-                            $font_color = "#00000045";
-                        } else {
+                            $font_color   = "#00000045";
+                        }
+                        else {
                             switch ($row['status']['idStatus']) {
                                 case 0:
                                     $color = "#27c500"; // Couleur pour le cas "connected"
@@ -91,8 +93,8 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
 
                         // Calculer le nombre de minutes, hours  ou days passés
                         $minutes = floor($diff / 60);
-                        $hours = floor($diff / 3600);
-                        $days = floor($diff / 86400);
+                        $hours   = floor($diff / 3600);
+                        $days    = floor($diff / 86400);
 
                         // Construire le résultat dans le format souhaité
                         $timePassed = "";
@@ -104,7 +106,8 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
                         }
                         if ($minutes > 0) {
                             $timePassed .= ($minutes % 60) . " minute(s) ";
-                        } else {
+                        }
+                        else {
                             $timePassed .= "<1 min";
                         }
 
@@ -145,7 +148,8 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
 
                     }
                     echo "</table>";
-                } else {
+                }
+                else {
                     echo "<p class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</p>";
                 }
 
@@ -167,28 +171,15 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
                     <input placeholder="Password" class="input" id="password" name="password" type="password" required>
                     <input id="button_submit" class="button_white" type="submit" name="button_submit" value="Register">
                 </form>
-
-
+                <input id="homeButton" class="button_white" type="button" name="homeButton" value="Return to home">
                 <?php
-                require_once 'backend/db.php';
-
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Récupérer les données du formulaire d'inscription
                     $username = $_POST['username'];
                     $password = $_POST['password'];
 
-                    // Chiffrer le mot de passe
-                    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-                    // Appeler la fonction pour enregistrer l'utilisateur dans la base de données
-                    if (db\set_registerUser($username, $hashedPassword)) {
-                        echo "Inscription réussie !";
-                        exit; // Terminer l'exécution du script après la redirection
-                    } else {
-                        echo "Erreur lors de l'inscription !";
-                    }
+                    echo auth\registerUser($username, $password) ? "Successfull registration" : "Registration failed";
                 }
-
                 ?>
 
             </div>
@@ -236,15 +227,18 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
                 body: JSON.stringify({ modifiedData: data_tmp }),
             })
         }
-
-    </script>
-    <script>
         const optionsSelect = document.getElementById('optionsSelect');
         const options = optionsSelect.options;
         for (let i = 0; i < options.length; i++) {
             const option = options[i];
             console.log(option.value);
         }
+    </script>
+    <script>
+        const homeButton = document.getElementById("homeButton");
+        homeButton.addEventListener("click", function () {
+            document.location.pathname = "/";
+        });
     </script>
 
 

@@ -3,7 +3,7 @@ session_start();
 
 require_once './backend/auth.php';
 // Vérifier si l'utilisateur est authentifié
-if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
+if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     // Rediriger vers une page d'erreur ou afficher un message d'erreur
     header('Location: ./auth/erreur.php');
     exit;

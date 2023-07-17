@@ -11,15 +11,15 @@ require_once 'db.php';
 function get_alluserinfo()
 {
     $alluserinfo = \db\get_alluserinfo();
-    $result = array();
+    $result      = array();
 
     if ($alluserinfo) {
 
         while ($row = $alluserinfo->fetch_assoc()) {
             // Convertir le statut en chaîne de caractères lisible
             $lastconnection = $row['lastconnection'];
-            $userId = $row['id'];
-            $status = "";
+            $userId         = $row['id'];
+            $status         = "";
             switch ($row['status']) {
                 case 0:
                     $status = 'connected';
@@ -42,13 +42,13 @@ function get_alluserinfo()
 
         // Retourner les données au format JSON
         return $result;
-    } else {
+    }
+    else {
         return false;
     }
 
 }
 
-// Lorsque l'utilisateur se connecte avec succès
 /**
  * Fonction de connexion utilisateur.
  *
@@ -60,36 +60,34 @@ function login($username, $password)
 {
     $userinfo = \db\get_username($username);
 
-    if ($userinfo) {
-        while ($row = $userinfo->fetch_assoc()) {
-            $hashedPasswordFromDB = $row['password'];
-            $userId = $row['id'];
+    if ($userinfo && $row = $userinfo->fetch_assoc()) {
+        $hashedPasswordFromDB = $row['password'];
+        $userId               = $row['id'];
 
-            if (password_verify($password, $hashedPasswordFromDB)) {
+        // Vérifier le mot de passe saisi avec le mot de passe haché de la base de données
+        if (password_verify($password, $hashedPasswordFromDB)) {
+            $token = generateAuthToken();
+            // Générer un jeton d'authentification unique
+            $authToken = array("id" => $userId, "token" => trim($token));
 
+            // Enregistrer le jeton d'authentification
+            if (saveAuthToken($userId, $token)) {
+                // Enregistrer le jeton d'authentification dans un cookie
+                setcookie('authToken', json_encode($authToken), time() + 3600, '/');
 
-                $token = generateAuthToken();
+                modifiedStatus($userId, 0);
 
-                // Générer un jeton d'authentification unique
-                $authToken = array("id" => $userId, "token" => $token);
-
-                // Enregistrer le jeton d'authentification
-                if (saveAuthToken($userId, $token)) {
-                    // Enregistrer le jeton d'authentification dans un cookie
-                    setcookie('authToken', json_encode($authToken), time() + 3600, '/');
-                    // Authentification réussie
-                    $_SESSION['authenticated'] = true;
-                    header('Location: ../index.php');
-                } else {
-                    header('Location: ./erreur.php');
-                }
-
+                // Authentification réussie
+                $_SESSION['authenticated'] = true;
+                header('Location: ../index.php');
                 exit;
             }
         }
-    } else {
-        echo 'Erreur de connexion';
     }
+
+    // Le nom d'utilisateur ou le mot de passe est incorrect ou une erreur s'est produite
+    header('Location: ./erreur.php');
+    exit;
 }
 
 /**
@@ -102,26 +100,29 @@ function checkLogin()
     \db\checkOnline();
     // Vérifier si le cookie d'authentification existe
     if (isset($_COOKIE['authToken'])) {
-        $authToken = json_decode($_COOKIE['authToken'], true);
+        // Décoder le cookie d'authentification pour obtenir les données du jeton
+        $authTokenCookie = json_decode($_COOKIE['authToken'], true);
 
-        // Vérifier si le jeton d'authentification correspond à celui enregistré dans votre système
-        if (validateAuthToken($authToken['id'], $authToken['token'])) {
-            // Autoriser la connexion
-            \db\keepAlive($authToken['id']);
+        // Vérifier si les données du jeton sont valides et non vides
+        if (
+            validateAuthToken($authTokenCookie['id'], $authTokenCookie['token'])
+        ) {
+            // Utiliser les données du jeton pour vérifier si le jeton est valide dans la base de données
+            \db\keepAlive($authTokenCookie['id']);
             return true;
-        } else {
-            // Refuser la connexion
-            \db\keepAlive($authToken['id']);
-            removeAuthToken($authToken['id']);
+        }
+        else {
+            // Si les données du jeton sont invalides ou vides, déconnecter l'utilisateur
+            logout();
             return false;
         }
-    } else {
+    }
+    else {
         // Le cookie d'authentification n'existe pas, l'utilisateur doit se connecter
         logout();
         return false;
     }
 }
-
 
 /**
  * Déconnecte l'utilisateur en supprimant le jeton d'authentification et le cookie correspondant.
@@ -132,11 +133,16 @@ function logout()
         // Supprimer le jeton d'authentification de votre système
         $authToken = json_decode($_COOKIE['authToken'], true);
         removeAuthToken($authToken['id']);
-        // Supprimer le cookie d'authentification
-        setcookie('authToken', '', time() - 3600, '/');
     }
-    $_SESSION['authenticated'] = false;
-    header('Location: ../auth/login.php');
+    // Supprimer le cookie d'authentification
+    setcookie('authToken', '', time() - 3600, '/');
+
+    // Détruire la session en cours
+    session_destroy();
+
+    // Réinitialiser les données de session
+    $_SESSION = array();
+    header('Location: ../auth/erreur.php');
 }
 
 /**
@@ -161,7 +167,8 @@ function saveAuthToken($userId, $authToken)
 {
     if (\db\saveAuthToken($userId, $authToken)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -177,7 +184,8 @@ function validateAuthToken($userId, $authToken)
 {
     if (\db\validateAuthToken($userId, $authToken)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -192,7 +200,8 @@ function removeAuthToken($userId)
 {
     if (\db\saveAuthToken($userId, NULL)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -201,9 +210,18 @@ function modifiedStatus($userId, $statusId)
 {
     if (\db\modifiedStatus($userId, $statusId)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
 
+function registerUser($username, $password)
+{
+    // Chiffrer le mot de passe
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    // Appeler la fonction pour enregistrer l'utilisateur dans la base de données
+    return \db\set_register($username, $hashedPassword);
+}
 ?>
