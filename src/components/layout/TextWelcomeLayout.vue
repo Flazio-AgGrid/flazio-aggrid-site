@@ -5,10 +5,12 @@
         >This is an {{ route.name }} page</el-text
       >
     </h1>
-    <p v-if="username">
+    <p v-if="user.id">
       {{ isAuth ? "Welcome" : "Goodbye" }}
-      <el-tooltip :content="`UserID : 'No userID'`">
-        <el-text v-if="username" :type="typeText"> {{ username }}</el-text>
+      <el-tooltip :content="`UserID : ${user.id}`">
+        <el-text v-if="user.username" :type="typeText">
+          {{ user.username }}</el-text
+        >
       </el-tooltip>
     </p>
     <slot />
@@ -18,10 +20,11 @@
 import { useRoute } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { ref, computed, type Ref } from "vue";
+import User from "@/models/Auth.models";
 
 const route = useRoute();
 const userStore = useUserStore();
 const isAuth: Ref<boolean> = ref(userStore.isAuthenticated);
-const username: Ref<string> = ref(userStore.getUsername);
+const user: Ref<User> = ref(userStore.getUser);
 const typeText = computed(() => (isAuth.value ? "success" : "warning"));
 </script>
