@@ -2,5 +2,5 @@
   <TextWelcomeLayout></TextWelcomeLayout>
 </template>
 <script lang="ts" setup>
-import TextWelcomeLayout from "@/components/layout/TextWelcomeLayout.vue";
+import TextWelcomeLayout from "../components/layout/TextWelcomeLayout.vue";
 </script>

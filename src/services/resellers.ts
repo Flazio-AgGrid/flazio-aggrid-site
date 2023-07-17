@@ -1,5 +1,5 @@
-import User from "@/models/Auth.models";
-import ResponseDefault from "@/models/Response.models";
+import User from "../models/Auth.models";
+import ResponseDefault from "../models/Response.models";
 import axios from "axios";
 import authHeader from "./auth-header";
 

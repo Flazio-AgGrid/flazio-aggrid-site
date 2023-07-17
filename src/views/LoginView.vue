@@ -21,11 +21,11 @@
 </template>
 
 <script lang="ts">
-import TextWelcomeLayout from "@/components/layout/TextWelcomeLayout.vue";
+import TextWelcomeLayout from "../components/layout/TextWelcomeLayout.vue";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../store/user";
-import { showNotification } from "@/utils";
+import { showNotification } from "../utils";
 
 export default defineComponent({
   name: "LoginView",

@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import { useStorage } from "@vueuse/core";
-import User from "@/models/Auth.models";
-import AuthServices from "@/services/auth";
-import { showNotification } from "@/utils";
+import User from "../models/Auth.models";
+import AuthServices from "../services/auth";
+import { showNotification } from "../utils";
 
 export const useUserStore = defineStore("user", {
   state: () => ({

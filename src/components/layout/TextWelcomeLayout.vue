@@ -18,9 +18,9 @@
 </template>
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
-import { useUserStore } from "@/store/user";
+import { useUserStore } from "../../store/user";
 import { ref, computed, type Ref } from "vue";
-import User from "@/models/Auth.models";
+import User from "../../models/Auth.models";
 
 const route = useRoute();
 const userStore = useUserStore();

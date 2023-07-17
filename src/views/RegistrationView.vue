@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import TextWelcomeLayout from "@/components/layout/TextWelcomeLayout.vue";
+import TextWelcomeLayout from "../components/layout/TextWelcomeLayout.vue";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 

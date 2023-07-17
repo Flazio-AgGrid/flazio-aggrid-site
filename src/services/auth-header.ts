@@ -1,4 +1,4 @@
-import User from "@/models/Auth.models";
+import User from "../models/Auth.models";
 
 export default function authHeader() {
   const user: User | null = JSON.parse(localStorage.getItem("user") || "");

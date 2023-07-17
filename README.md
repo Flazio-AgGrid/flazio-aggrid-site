@@ -1,3 +1,21 @@
+## Project setup
+
+```bash
+npm install
+```
+
+### Compiles and hot-reloads for development
+
+```bash
+npm run dev
+```
+
+### Compiles and minifies for production
+
+```bash
+npm run build
+```
+
 # flazio-aggrid-site
 ## Dévelopement
 - Pour chaque nouvelle fonctionnalité, une **nouvelle *branch*** portant le nom de celle-ci devra être créer.
@@ -54,3 +72,4 @@ git merge <nom de votre branch à fusionner>
 ```
 git branch -d <branch>
 ```
+

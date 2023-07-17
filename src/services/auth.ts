@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import User from "@/models/Auth.models";
-import ResponseDefault, { ErrorResponse } from "@/models/Response.models";
+import User from "../models/Auth.models";
+import ResponseDefault, { ErrorResponse } from "../models/Response.models";
 import axios, { AxiosError } from "axios";
 import authHeader from "./auth-header";
-import { showNotification } from "@/utils/notif";
+import { showNotification } from "../utils/notif";
 
 const API_URL = "http://localhost:8090/api/auth/";
 

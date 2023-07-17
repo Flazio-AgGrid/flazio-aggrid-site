@@ -23,8 +23,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
-import { useUserStore } from "@/store/user";
-import { toggleDark, isDark } from "@/utils/index";
+import { useUserStore } from "../../store/user";
+import { toggleDark, isDark } from "../../utils/index";
 import { useRouter } from "vue-router";
 
 export default defineComponent({

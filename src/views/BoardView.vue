@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts">
-import TextWelcomeLayout from "@/components/layout/TextWelcomeLayout.vue";
-import { RowData, ColumnDef } from "@/models/DataStore.models";
+import TextWelcomeLayout from "../components/layout/TextWelcomeLayout.vue";
+import { RowData, ColumnDef } from "../models/DataStore.models";
 import { AgGridVue } from "ag-grid-vue3";
-import { useDataStore } from "@/store/data";
+import { useDataStore } from "../store/data";
 import { onMounted, ref, watch, Ref } from "vue";
 import { CellValueChangedEvent, GridApi, ColumnApi } from "ag-grid-community";
-import { isDark } from "@/utils";
+import { isDark } from "../utils";
 
 export default {
   name: "App",

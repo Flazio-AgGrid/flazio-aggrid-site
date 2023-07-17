@@ -12,19 +12,19 @@
       <RouterView />
     </el-main>
   </el-container>
-</template>
+</template> 
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 import NavBarLayout from "./components/layout/NavBarLayout.vue";
-import { useUserStore } from "@/store/user";
+import { useUserStore } from "./store/user";
 
 const userStore = useUserStore();
 
 onMounted(() => {
-  const isAuth = userStore.checkAuthenticated();
-  userStore.setAuthenticated(isAuth);
+	const isAuth = userStore.checkAuthenticated();
+	userStore.setAuthenticated(isAuth);
 });
 </script>
 

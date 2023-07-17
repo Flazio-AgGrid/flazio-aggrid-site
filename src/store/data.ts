@@ -3,7 +3,7 @@ import {
   ColumnDef,
   CategoryData,
   StatusData,
-} from "@/models/DataStore.models";
+} from "../models/DataStore.models";
 import { defineStore } from "pinia";
 //import { useStorage } from "@vueuse/core";
 export type Rootstate = {
