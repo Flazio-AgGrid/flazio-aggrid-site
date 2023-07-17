@@ -2,20 +2,45 @@
 <html>
 
 <head>
-  <title>Authentification</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM Flazio</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
 </head>
 
 <body>
-  <h2>Authentification</h2>
-  <form method="POST" action="login.php">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br>
+  <div id="page_login">
+    <div class="box_user_management">
+      <h1 class="title_box">Connection</h1>
+      <div class="box_user_management_content">
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
-    <input type="submit" value="Login">
-    <a href="registration.php">Registration</a>
-  </form>
+        <form method="POST" action="login.php">
+
+          <input placeholder="Username" class="input" id="username" name="username" type="text" required="">
+          <input placeholder="Password" class="input" id="password" name="password" type="password" required="">
+          <input id="button_submit" class="button_white" type="submit" name="button_submit" value="Register">
+        </form>
+
+      </div>
+    </div>
+
+    
+  </div>
+
+
+  <footer>
+    <p id="footer_contact">
+      In case of any issues, contact the administrator <a id="a_footer_contact"
+        href="mailto:example@flazio.com">here</a> .
+    </p>
+  </footer>
 </body>
 
 </html>

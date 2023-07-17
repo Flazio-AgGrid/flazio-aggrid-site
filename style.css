@@ -12,6 +12,7 @@ body {
 
 #page {
     display: flex;
+
 }
 
 h1,
@@ -67,8 +68,14 @@ table {
 
 
 
-.title_box {
+#title_box {
     margin: 4vh 3vh 2vh 3vh;
+    font-size: 30px;
+}
+
+.title_box {
+    font-size: 30px;
+    margin-top: 5vh;
 }
 
 td {
@@ -90,16 +97,23 @@ td {
 
 .header_box_user {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    margin-inline: 50px;
+    border-bottom: #000000 solid 1px;
+    align-items: baseline;
 }
 
 #button_box_user {
-    width: 8vh;
-    height: 7vh;
+    width: 5%;
+    height: 50%;
     margin-top: 2vh;
+    color: #000000b9;
 }
 
-
+button#button_box_user {
+    display: flex;
+    justify-content: center;
+}
 
 /* ------------------------Form management user ------------------------------------- */
 
@@ -197,5 +211,20 @@ td {
 
 .no_data_error {
     text-align: center;
-    align-items: center
+    align-items: center;
+}
+
+#page_login {
+    display: flex;
+    justify-content: center;
+}
+
+#footer_contact {
+    color: #00000075;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+#a_footer_contact {
+    color: inherit!important;
 }

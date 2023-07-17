@@ -34,8 +34,8 @@ if (isset($_SESSION['authenticated']) === false && auth\checkLogin()) {
         <div class="box_table_all_user">
 
             <div class="header_box_user">
-                <h1 class="title_box">User Management Menu</h1>
-                <button id="button_box_user" onclick="window.location.reload()">
+                <h1 id="title_box">User Management Menu</h1>
+                <button class="input" id="button_box_user" onclick="window.location.reload()">
                     <span class="material-symbols-outlined">sync</span>
                 </button>
             </div>
