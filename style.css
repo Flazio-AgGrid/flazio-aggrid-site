@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
 
 body {
     margin: 0;
@@ -53,7 +53,7 @@ table {
 
 
 .box_user_management {
-    height: 50vh;
+    height: 60vh;
     width: 60vh;
     margin: 5vh 5vh 5vh 3vh;
     border-radius: 50px;
@@ -118,7 +118,7 @@ button#button_box_user {
 /* ------------------------Form management user ------------------------------------- */
 
 .input {
-    margin: 30px;
+    margin-top: 40px;
     background: none;
     border: none;
     outline: none;
@@ -136,7 +136,7 @@ button#button_box_user {
 .button_white {
     color: #090909;
     padding: 2%;
-    width: 35%;
+    width: 40%;
     font-size: 18px;
     border-radius: 0.5em;
     background: #e8e8e8;
@@ -146,6 +146,7 @@ button#button_box_user {
         -6px -6px 12px #ffffff;
     font-family: 'Montserrat', sans-serif;
     margin: 3vh;
+    text-decoration: none;
 }
 
 .button_white:hover {
@@ -157,6 +158,10 @@ button#button_box_user {
 .button_white:active {
     box-shadow: 4px 4px 12px #c5c5c5,
         -4px -4px 12px #ffffff;
+}
+
+#button_submit {
+    width: 10vw;
 }
 
 /* ------------------------Botton management user ------------------------------------- */
@@ -198,18 +203,20 @@ button#button_box_user {
 .close:focus {
     color: black;
     text-decoration: none;
- 
 
-span.material-symbols-outlined:active {
-    transform: rotate(90deg);
-}
-   cursor: pointer;
+
+    span.material-symbols-outlined:active {
+        transform: rotate(90deg);
+    }
+
+    cursor: pointer;
 }
 
 .ellipsis {
     font-weight: bold;
     font-size: 25px;
     cursor: pointer;
+    padding-inline: 2vw;
 }
 
 /* ------------------------ Modal ------------------------------------- */
@@ -231,5 +238,67 @@ span.material-symbols-outlined:active {
 }
 
 #a_footer_contact {
-    color: inherit!important;
+    color: inherit !important;
+}
+
+#p_error_text {
+    font-size: 25px;
+    margin-block: 8vh;
+    margin-inline: 2vh;
+}
+
+a#button_submit {
+    font-size: 21PX;
+    padding-inline: 5vh;
+}
+
+/* Conteneur de la dropbox */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Contenu de la dropbox (caché par défaut) */
+.dropdown-content {
+    display: none;
+    position: fixed;
+    margin-inline: -4%;
+    background-color: #f9f9f9;
+    min-width: 2vh;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 10%;
+}
+
+/* Liens à l'intérieur de la dropbox */
+.dropdown-content a {
+    color: #000000;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 1.1vw;
+    border-bottom: #00000050 solid 1px;
+}
+
+.dropdown-content a:hover {
+    background-color: #dddddd;
+}
+
+.dropdown_one {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.dropdown_three {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+/* Changement de style au survol de la dropbox */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.space {
+    height: 2vh;
 }

@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRM Flazio</title>
   <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -23,8 +21,11 @@
 
         <form method="POST" action="login.php">
 
+          <div class="space"></div>
           <input placeholder="Username" class="input" id="username" name="username" type="text" required="">
+          <div class="space"></div>
           <input placeholder="Password" class="input" id="password" name="password" type="password" required="">
+          <div class="space"></div>
           <input id="button_submit" class="button_white" type="submit" name="button_submit" value="Login">
         </form>
 
