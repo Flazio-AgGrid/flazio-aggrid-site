@@ -79,6 +79,7 @@ function update_reseller_category()
             \log\set_log('updated', $authTokenCookie['id'], $id, json_encode(array("id_cat" => $id_cat)));
 
             \db\set_fake_maps_info($tableau);
+            \db\update_fk_lead($id, $id_cat);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
         }
     }

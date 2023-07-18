@@ -162,8 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
         list_modified_row.length <= 0 &&
         document.getElementById("bouttonSave")
       ) {
-        const button = document.getElementById("bouttonSave");
-        button.parentNode.removeChild(button);
+        removeButton("bouttonSave");
       }
     } else if (event.column.getColId() === "status_cat") {
       const modifiedData = reassignationIdStatus(event.data);
@@ -471,6 +470,7 @@ async function saveChangesToBackend() {
       list_modified_row = [];
       result.messages.map((el) => createNotification(el.message));
       majDataFront("index");
+      removeButton("bouttonSave");
     })
     .catch((error) => {
       console.error("Erreur lors de l'envoi des données au backend:", error);
