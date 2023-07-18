@@ -2,6 +2,7 @@
 namespace grid;
 
 require_once 'db.php';
+require_once 'logs.php';
 
 /**
  * Récupère les données des revendeurs et des catégories depuis la base de données.
@@ -58,8 +59,9 @@ function update_reseller_category()
     $response = array();
 
     // Récupérer les données modifiées depuis la requête POST
-    $jsonData     = file_get_contents('php://input');
-    $modifiedData = json_decode($jsonData, true);
+    $jsonData        = file_get_contents('php://input');
+    $modifiedData    = json_decode($jsonData, true);
+    $authTokenCookie = json_decode($_COOKIE['authToken'], true);
 
     foreach ($modifiedData['modifiedData'] as $row) {
         $id     = $row["id"];
@@ -67,15 +69,14 @@ function update_reseller_category()
         $count  = \db\get_verify_fk_lead_exists($row, $id, $id_cat);
 
         if ($count > 0) {
-            \log\set_log('updated', $modifiedData['initiator'], $id, json_encode(array("id_cat" => $id_cat)));
+            \log\set_log('updated', $authTokenCookie['id'], $id, json_encode(array("id_cat" => $id_cat)));
 
             \db\update_fk_lead($id, $id_cat);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
         }
         else {
             $tableau = \db\get_adress_reseller($id);
-
-            \log\set_log('updated', $modifiedData['initiator'], $id, json_encode(array("id_cat" => $id_cat)));
+            \log\set_log('updated', $authTokenCookie['id'], $id, json_encode(array("id_cat" => $id_cat)));
 
             \db\set_fake_maps_info($tableau);
             array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id));
@@ -151,7 +152,9 @@ function update_manually_reseller_category()
     $id           = $row["id"];
     $lead_status  = $row['lead_status'];
 
-    \log\set_log('updated', $modifiedData['initiator'], $id, json_encode(array("lead_status" => $lead_status)));
+    $authTokenCookie = json_decode($_COOKIE['authToken'], true);
+
+    \log\set_log('updated', $authTokenCookie['id'], $id, json_encode(array("lead_status" => $lead_status)));
 
     if (\db\update_status_lead($id, $lead_status)) {
         array_push($response, array("status" => "OK", "message" => "Mise à jour réussie pour l'enregistrement avec l'ID : " . $id, "data" => $id . "&" . $lead_status));

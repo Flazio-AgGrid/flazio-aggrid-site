@@ -315,12 +315,21 @@ function createLogoutButton() {
   });
 
   logoutButton.addEventListener("click", async () => {
-    const logout = await fetch("backend.php?page=logout");
-    createNotification(logout ? "Successful logout" : "Failed logout");
-    document.location.pathname = "/auth/login.php";
+    await logout();
   });
 
   buttonArea.appendChild(logoutButton);
+}
+
+async function logout() {
+  try {
+    const logout = await fetch("backend.php?page=logout");
+    createNotification(logout ? "Successful logout" : "Failed logout");
+    document.location.pathname = "/auth/login.php";
+  } catch (error) {
+    console.error(error);
+    createNotification(error);
+  }
 }
 /**
  * Redimensionne automatiquement toutes les colonnes de la grille.
@@ -414,21 +423,14 @@ function setStatus(data) {
 /**
  * Envoie les modifications au backend pour sauvegarde.
  */
-function saveChangesToBackend() {
+async function saveChangesToBackend() {
   var data_tmp = list_modified_row;
-  let php_user = getCookie("PHP_USER");
-  if (php_user === null) {
-    createNotification(`Please log in!`);
-    document.cookie = "";
-    document.location.reload();
-    return false;
-  }
   fetch("backend.php?page=index", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data_tmp, initiator: php_user }),
+    body: JSON.stringify({ modifiedData: data_tmp }),
   })
     .then((response) => response.json())
     .then((result) => {
@@ -452,21 +454,13 @@ function saveChangesToBackend() {
  * Envoie les modifications automatiquement au backend pour sauvegarde.
  * @param {Object} data - Les données modifiées à envoyer.
  */
-function saveChangesToBackendAuto(data) {
-  console.log(data);
-  let php_user = getCookie("PHP_USER");
-  if (php_user === null) {
-    createNotification(`Please log in!`);
-    document.cookie = "";
-    document.location.reload();
-    return false;
-  }
+async function saveChangesToBackendAuto(data) {
   fetch("backend.php?page=management", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data, initiator: php_user }),
+    body: JSON.stringify({ modifiedData: data }),
   })
     .then((response) => response.json())
     .then((result) => {
@@ -723,21 +717,4 @@ function removeButton(id) {
   } else {
     return false;
   }
-}
-
-function getCookie(name) {
-  var cookies = document.cookie.split(";");
-
-  for (var i = 0; i < cookies.length; i++) {
-    var cookie = cookies[i].trim();
-
-    // Vérifier si le nom du cookie correspond à celui recherché
-    if (cookie.indexOf(name + "=") === 0) {
-      // Extraire la valeur du cookie
-      return cookie.substring(name.length + 1);
-    }
-  }
-
-  // Retourner null si le cookie n'est pas trouvé
-  return null;
 }
