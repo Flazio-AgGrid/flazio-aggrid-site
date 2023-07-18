@@ -46,7 +46,7 @@
 </html>
 
 <?php
-require '../backend/auth.php';
+require_once '../backend/db.php';
 
 session_start();
 
@@ -56,5 +56,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password = $_POST['password'];
   auth\login($username, $password);
 
-}
+      // Vérifier si le mot de passe fourni correspond au hachage stocké
+      if (password_verify($password, $hashedPasswordFromDB)) {
+        // Authentification réussie
+        $_SESSION['authenticated'] = true;
+        header('Location: ../index.php');
+        exit;
+      } else {
+        // Mot de passe incorrect
+        echo 'Mot de passe incorrect.';
+      }
+    } else {
+      // Nom d'utilisateur incorrect
+      echo 'Nom d\'utilisateur incorrect.';
+    }
 ?>

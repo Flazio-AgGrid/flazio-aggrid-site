@@ -179,6 +179,9 @@ function set_fake_maps_info($tableau)
 function get_username($username)
 {
     global $mysqli;
+
+    $query = "SELECT * FROM users WHERE username = ?";
+
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL
         $query = "SELECT username, password, id FROM users WHERE username = ?";
@@ -410,6 +413,81 @@ function modifiedStatus($userId, $statusId)
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+/**
+ * Récupère tous les logs de la base de données.
+ * @return mixed|array|false Retourne un tableau contenant les logs si la requête est réussie, sinon retourne false.
+ */
+function get_log_all()
+{
+    global $mysqli;
+
+    $getLogSql = "SELECT l.id, initiator, objectToLog, l.status FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id";
+
+    try {
+        $result_data = $mysqli->query($getLogSql);
+        return $result_data;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+/**
+ * Récupère un log spécifique par son ID.
+ * @param int $id L'ID du log à récupérer.
+ * @return mixed|array|false Retourne un tableau contenant le log si la requête est réussie, sinon retourne false.
+ */
+function get_log_by_id($id)
+{
+    global $mysqli;
+
+    $getLogSql = "SELECT l.id, initiator, objectToLog, l.status FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($getLogSql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+
+/**
+ * Insère un enregistrement dans la table "log" avec les informations fournies.
+ *
+ * @param string $status - Le statut de l'enregistrement.
+ * @param int $initiator - L'initiateur de l'action.
+ * @param int $objectToLog - L'objet à enregistrer.
+ * @param string $newData - Les nouvelles données au format JSON.
+ * @return bool - Retourne true si l'insertion est réussie, sinon false en cas d'erreur.
+ */
+function set_log($status, $initiator, $objectToLog, $newData)
+{
+    global $mysqli;
+
+    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime, newData) VALUES (?, ?, ?, NOW(), ?)";
+
+    try {
+        // Vérifie si l'enregistrement existe
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("siis", $status, $objectToLog, $initiator, $newData);
+        $stmt->execute();
+        $stmt->close();
+
+        return true;
     }
     catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();

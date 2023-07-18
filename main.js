@@ -376,31 +376,39 @@ function setStatus(data) {
    * @param {Object} el - L'élément à mettre à jour.
    */
   function updateStatus(el) {
-    el.status_cat = status.find((sta) => sta.id == el.lead_status).title;
-    el.lead_status = status.find((sta) => sta.id == el.lead_status).id;
+    try {
+      el.status_cat = status.find((sta) => sta.id == el.lead_status).title;
+      el.lead_status = status.find((sta) => sta.id == el.lead_status).id;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  data_tmp.forEach((el) => {
-    switch (el.lead_status) {
-      case "1": {
-        updateStatus(el);
-        break;
+  try {
+    data_tmp.forEach((el) => {
+      switch (el.lead_status) {
+        case "1": {
+          updateStatus(el);
+          break;
+        }
+        case "2": {
+          updateStatus(el);
+          break;
+        }
+        case "3": {
+          updateStatus(el);
+          break;
+        }
+        default: {
+          console.log(el);
+          updateStatus(el);
+          break;
+        }
       }
-      case "2": {
-        updateStatus(el);
-        break;
-      }
-      case "3": {
-        updateStatus(el);
-        break;
-      }
-      default: {
-        console.log(el);
-        updateStatus(el);
-        break;
-      }
-    }
-  });
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 /**
@@ -408,17 +416,23 @@ function setStatus(data) {
  */
 function saveChangesToBackend() {
   var data_tmp = list_modified_row;
+  let php_user = getCookie("PHP_USER");
+  if (php_user === null) {
+    createNotification(`Please log in!`);
+    document.cookie = "";
+    document.location.reload();
+    return false;
+  }
   fetch("backend.php?page=index", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data_tmp }),
+    body: JSON.stringify({ modifiedData: data_tmp, initiator: php_user }),
   })
     .then((response) => response.json())
     .then((result) => {
       list_modified_row = [];
-      console.debug(result); // Affiche la réponse du backend
       result.messages.map((el) => createNotification(el.message));
       majDataFront("index");
     })
@@ -439,18 +453,26 @@ function saveChangesToBackend() {
  * @param {Object} data - Les données modifiées à envoyer.
  */
 function saveChangesToBackendAuto(data) {
+  console.log(data);
+  let php_user = getCookie("PHP_USER");
+  if (php_user === null) {
+    createNotification(`Please log in!`);
+    document.cookie = "";
+    document.location.reload();
+    return false;
+  }
   fetch("backend.php?page=management", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data }),
+    body: JSON.stringify({ modifiedData: data, initiator: php_user }),
   })
     .then((response) => response.json())
     .then((result) => {
       console.debug(result); // Affiche la réponse du backend
       result.messages.map((el) => createNotification(el.message));
-      majDataFront("management");
+      //majDataFront("management");
     })
     .catch((error) => {
       console.error("Erreur lors de l'envoi des données au backend:", error);
@@ -490,7 +512,7 @@ function majDataFront(mode) {
       // Ajuste la taille des colonnes
       autoSizeAll();
 
-      // Ferme le panneau d'outils de la grille
+      // // Ferme le panneau d'outils de la grille
       gridOptions.api.closeToolPanel();
     })
     .catch((error) => {
@@ -701,4 +723,21 @@ function removeButton(id) {
   } else {
     return false;
   }
+}
+
+function getCookie(name) {
+  var cookies = document.cookie.split(";");
+
+  for (var i = 0; i < cookies.length; i++) {
+    var cookie = cookies[i].trim();
+
+    // Vérifier si le nom du cookie correspond à celui recherché
+    if (cookie.indexOf(name + "=") === 0) {
+      // Extraire la valeur du cookie
+      return cookie.substring(name.length + 1);
+    }
+  }
+
+  // Retourner null si le cookie n'est pas trouvé
+  return null;
 }
