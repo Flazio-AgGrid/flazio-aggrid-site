@@ -413,6 +413,7 @@ function modifiedStatus($userId, $idStatus)
         $stmt = $mysqli->prepare($updateSql);
         $stmt->bind_param("ii", $idStatus, $userId);
         $stmt->execute();
+        $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
     }
