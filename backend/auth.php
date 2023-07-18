@@ -11,15 +11,15 @@ require_once 'db.php';
 function get_alluserinfo()
 {
     $alluserinfo = \db\get_alluserinfo();
-    $result = array();
+    $result      = array();
 
     if ($alluserinfo) {
 
         while ($row = $alluserinfo->fetch_assoc()) {
             // Convertir le statut en chaîne de caractères lisible
             $lastconnection = $row['lastconnection'];
-            $userId = $row['id'];
-            $status = "";
+            $userId         = $row['id'];
+            $status         = "";
             switch ($row['status']) {
                 case 0:
                     $status = 'connected';
@@ -42,7 +42,8 @@ function get_alluserinfo()
 
         // Retourner les données au format JSON
         return $result;
-    } else {
+    }
+    else {
         return false;
     }
 
@@ -61,7 +62,7 @@ function login($username, $password)
 
     if ($userinfo && $row = $userinfo->fetch_assoc()) {
         $hashedPasswordFromDB = $row['password'];
-        $userId = $row['id'];
+        $userId               = $row['id'];
 
         // Vérifier le mot de passe saisi avec le mot de passe haché de la base de données
         if (password_verify($password, $hashedPasswordFromDB)) {
@@ -108,12 +109,14 @@ function checkLogin()
             // Utiliser les données du jeton pour vérifier si le jeton est valide dans la base de données
             \db\keepAlive($authTokenCookie['id']);
             return true;
-        } else {
+        }
+        else {
             // Si les données du jeton sont invalides ou vides, déconnecter l'utilisateur
             logout();
             return false;
         }
-    } else {
+    }
+    else {
         // Le cookie d'authentification n'existe pas, l'utilisateur doit se connecter
         logout();
         return false;
@@ -133,8 +136,11 @@ function logout()
     // Supprimer le cookie d'authentification
     setcookie('authToken', '', time() - 3600, '/');
 
-    // Détruire la session en cours
-    session_destroy();
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        // Détruire la session en cours
+        session_destroy();
+    }
+
 
     // Réinitialiser les données de session
     $_SESSION = array();
@@ -163,7 +169,8 @@ function saveAuthToken($userId, $authToken)
 {
     if (\db\saveAuthToken($userId, $authToken)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -179,7 +186,8 @@ function validateAuthToken($userId, $authToken)
 {
     if (\db\validateAuthToken($userId, $authToken)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -194,7 +202,8 @@ function removeAuthToken($userId)
 {
     if (\db\saveAuthToken($userId, NULL)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -203,7 +212,8 @@ function modifiedStatus($userId, $statusId)
 {
     if (\db\modifiedStatus($userId, $statusId)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }

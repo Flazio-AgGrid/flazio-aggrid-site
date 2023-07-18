@@ -20,6 +20,7 @@ export default class HistoryResellers {
     new agGrid.Grid(document.querySelector("#historyGrid"), gridOptions);
 
     gridOptions.api.setRowData(this.data);
+    this.autoSizeAll(gridOptions);
   }
 
   createDialog() {
@@ -38,7 +39,7 @@ export default class HistoryResellers {
       dialog.style.flexDirection = "column";
       dialog.style.alignItems = "center";
       dialog.style.justifyContent = "center";
-      dialog.style.width = "calc(90% - 70px)";
+      dialog.style.width = "calc(75% - 70px)";
       dialog.style.height = "calc(100% - 70px)";
       dialog.style.padding = "35px";
       dialog.style.boxSizing = "border-box";
@@ -86,7 +87,20 @@ export default class HistoryResellers {
       { headerName: "ID Reseller", field: "objectToLog" },
       { headerName: "Status", field: "status" },
       { headerName: "Date", field: "dateTime" },
+      { headerName: "Old Value", field: "oldData" },
       { headerName: "New Value", field: "newData" },
     ];
+  }
+  /**
+   * Redimensionne automatiquement toutes les colonnes de la grille.
+   * @param {boolean} [skipHeader=false] - Indique si l'en-tête doit être exclu du redimensionnement.
+   */
+  autoSizeAll(gridOptions, skipHeader) {
+    const allColumnIds = [];
+    gridOptions.columnApi.getColumns().forEach((column) => {
+      allColumnIds.push(column.getId());
+    });
+    console.log(allColumnIds);
+    gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
   }
 }

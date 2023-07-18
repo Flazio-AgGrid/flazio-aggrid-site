@@ -26,7 +26,8 @@ function get_reseller()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -45,7 +46,8 @@ function get_category()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -75,7 +77,8 @@ function get_verify_fk_lead_exists($row, $id, $id_cat)
         $stmt->close();
 
         return $count;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -99,7 +102,8 @@ function update_fk_lead($id, $id_cat)
         $stmt->execute();
         $stmt->close();
         return true;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -117,10 +121,11 @@ function get_adress_reseller($id)
     $query = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
 
     try {
-        $result = $mysqli->query($query);
+        $result          = $mysqli->query($query);
         $tableau_adresse = $result->fetch_all();
         return $tableau_adresse;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -139,18 +144,18 @@ function set_fake_maps_info($tableau)
 
     try {
         foreach ($tableau as $row) {
-            $fk_lead = $row[0];
-            $jsondata = json_encode(
+            $fk_lead           = $row[0];
+            $jsondata          = json_encode(
                 array(
-                    "formatted_address" => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
+                    "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
                     "formatted_phone_number" => "123 xxx 6789",
-                    "name" => "Example",
-                    "website" => "http://www.example.it/"
+                    "name"                   => "Example",
+                    "website"                => "http://www.example.it/"
                 )
             );
-            $website = "example.it";
-            $warning = rand(0, 1);
-            $id_cat = null;
+            $website           = "example.it";
+            $warning           = rand(0, 1);
+            $id_cat            = null;
             $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
 
             $stmt = $mysqli->prepare($query);
@@ -159,7 +164,8 @@ function set_fake_maps_info($tableau)
         }
         $stmt->close();
         return true;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -179,12 +185,13 @@ function get_username($username)
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL
         $query = "SELECT username, password, id FROM users WHERE username = ?";
-        $stmt = $mysqli->prepare($query);
+        $stmt  = $mysqli->prepare($query);
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->num_rows > 0 ? $result : false;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -210,12 +217,14 @@ function set_register($username, $hashedPassword)
         $stmt->execute();
         $stmt->close();
         return true;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
 
         if ($th->getCode() === 1062) {
             echo "Nom d'utilisateur déjà utilisé.";
             return false;
-        } else {
+        }
+        else {
             echo "Une erreur s'est produite : " . $th->getMessage();
             return false;
         }
@@ -235,7 +244,8 @@ function get_reseller_set_manually()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -254,7 +264,8 @@ function get_status()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -275,7 +286,8 @@ function update_status_lead($id, $lead_status)
         $stmt->close();
 
         return $rowCount === 1 ? true : false;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -291,7 +303,8 @@ function get_alluserinfo()
     try {
         $result = $mysqli->query($query);
         return $result->num_rows > 0 ? $result : false;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -318,13 +331,15 @@ function validateAuthToken($userid, $token)
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
-            $row = $result->fetch_assoc();
+            $row     = $result->fetch_assoc();
             $dbToken = $row['token'];
             return $dbToken === $token;
-        } else {
+        }
+        else {
             return false;
         }
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -342,7 +357,8 @@ function saveAuthToken($userId, $token)
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -352,7 +368,7 @@ function keepAlive($userId)
 {
     global $mysqli;
 
-    $updateSql = "UPDATE users SET lastconnection = ? WHERE id = ?";
+    $updateSql      = "UPDATE users SET lastconnection = ? WHERE id = ?";
     $lastconnection = date('Y-m-d H:i:s');
     try {
         $stmt = $mysqli->prepare($updateSql);
@@ -361,7 +377,8 @@ function keepAlive($userId)
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -377,7 +394,8 @@ function checkOnline()
         $stmt->execute();
         $stmt->close();
         return true;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -395,26 +413,8 @@ function modifiedStatus($userId, $statusId)
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
-    } catch (\Throwable $th) {
-        echo "Une erreur s'est produite : " . $th->getMessage();
-        return false;
     }
-}
-
-/**
- * Récupère tous les logs de la base de données.
- * @return mixed|array|false Retourne un tableau contenant les logs si la requête est réussie, sinon retourne false.
- */
-function get_log_all()
-{
-    global $mysqli;
-
-    $getLogSql = "SELECT l.id, initiator, objectToLog, l.status FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id";
-
-    try {
-        $result_data = $mysqli->query($getLogSql);
-        return $result_data;
-    } catch (\Throwable $th) {
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -425,11 +425,11 @@ function get_log_all()
  * @param int $id L'ID du log à récupérer.
  * @return mixed|array|false Retourne un tableau contenant le log si la requête est réussie, sinon retourne false.
  */
-function get_log_by_id($id)
+function get_log_by_reseller_id($id)
 {
     global $mysqli;
 
-    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime,newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
+    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime, oldData, newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
 
     try {
         $stmt = $mysqli->prepare($getLogSql);
@@ -437,7 +437,27 @@ function get_log_by_id($id)
         $stmt->execute();
         $result = $stmt->get_result();
         return $result;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function get_log_by_user_id($id)
+{
+    global $mysqli;
+
+    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime, oldData, newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE u.id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($getLogSql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -453,21 +473,22 @@ function get_log_by_id($id)
  * @param string $newData - Les nouvelles données au format JSON.
  * @return bool - Retourne true si l'insertion est réussie, sinon false en cas d'erreur.
  */
-function set_log($status, $initiator, $objectToLog, $newData)
+function set_log($status, $initiator, $objectToLog, $oldData, $newData)
 {
     global $mysqli;
 
-    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime, newData) VALUES (?, ?, ?, NOW(), ?)";
+    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime, oldData,newData) VALUES (?, ?, ?, NOW(),?, ?)";
 
     try {
         // Vérifie si l'enregistrement existe
         $stmt = $mysqli->prepare($updateSql);
-        $stmt->bind_param("siis", $status, $objectToLog, $initiator, $newData);
+        $stmt->bind_param("siiss", $status, $objectToLog, $initiator, $oldData, $newData);
         $stmt->execute();
         $stmt->close();
 
         return true;
-    } catch (\Throwable $th) {
+    }
+    catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }

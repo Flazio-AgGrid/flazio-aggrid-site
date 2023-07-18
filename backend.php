@@ -67,7 +67,7 @@ switch ($page) {
     case 'logs':
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
             if (auth\checkLogin()) {
-                echo log\get_log_by_id($_GET['id']);
+                echo log\get_log_by_id($_GET['id'], $_GET['modeUser']);
             }
         }
         break;

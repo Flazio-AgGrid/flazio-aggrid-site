@@ -52,7 +52,7 @@ const gridOptions = {
         action: async () => {
           const selectedRow = params.node.data;
 
-          fetch(`backend.php?page=logs&id=${selectedRow.id}`)
+          fetch(`backend.php?page=logs&id=${selectedRow.id}&modeUser=false`)
             .then((response) => response.json())
             .then((data) => {
               console.debug(data);
