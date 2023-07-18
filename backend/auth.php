@@ -95,9 +95,9 @@ function login($username, $password)
  */
 function checkLogin()
 {
-    \db\checkOnline();
     // Vérifier si le cookie d'authentification existe
     if (isset($_COOKIE['authToken'])) {
+        \db\checkOnline();
         // Décoder le cookie d'authentification pour obtenir les données du jeton
         $authTokenCookie = json_decode($_COOKIE['authToken'], true);
 
