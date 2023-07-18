@@ -97,7 +97,7 @@ function checkLogin()
 {
     // Vérifier si le cookie d'authentification existe
     if (isset($_COOKIE['authToken'])) {
-        \db\checkOnline();
+        // \db\checkOnline();
         // Décoder le cookie d'authentification pour obtenir les données du jeton
         $authTokenCookie = json_decode($_COOKIE['authToken'], true);
 
@@ -177,11 +177,7 @@ function saveAuthToken($userId, $authToken)
  */
 function validateAuthToken($userId, $authToken)
 {
-    if (\db\validateAuthToken($userId, $authToken)) {
-        return true;
-    } else {
-        return false;
-    }
+    return \db\validateAuthToken($userId, $authToken);
 }
 
 /**
@@ -192,20 +188,12 @@ function validateAuthToken($userId, $authToken)
  */
 function removeAuthToken($userId)
 {
-    if (\db\saveAuthToken($userId, NULL)) {
-        return true;
-    } else {
-        return false;
-    }
+    return \db\saveAuthToken($userId, NULL);
 }
 
-function modifiedStatus($userId, $statusId)
+function modifiedStatus($userId, $idStatus)
 {
-    if (\db\modifiedStatus($userId, $statusId)) {
-        return true;
-    } else {
-        return false;
-    }
+    return \db\modifiedStatus($userId, $idStatus);
 }
 
 function registerUser($username, $password)
@@ -216,4 +204,11 @@ function registerUser($username, $password)
     // Appeler la fonction pour enregistrer l'utilisateur dans la base de données
     return \db\set_register($username, $hashedPassword);
 }
+
+function deleteUser($userId)
+{
+    return \db\deleteUser($userId);
+
+}
+
 ?>

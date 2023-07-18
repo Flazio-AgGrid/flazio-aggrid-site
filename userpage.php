@@ -17,16 +17,12 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Flazio</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-
-
-
-
+    <script src="history.js"></script>
 </head>
 
 <body>
@@ -64,7 +60,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         $color_status = ""; // Variable pour stocker la couleur de fond
                         $color = ""; // Variable pour stocker la couleur de l'élément dot
                         $font_color = ""; // Variable pour stocker la couleur de la police
-                
+
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
                             $font_color = "#00000045";
@@ -75,6 +71,12 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                                     break;
                                 case 1:
                                     $color = "#ff0000"; // Couleur pour le cas "offline"
+                                    break;
+                                case 2:
+                                    $color = "#ffaa00"; // Couleur pour le cas "activated"
+                                    break;
+                                case 3:
+                                    $color = "#000000"; // Couleur pour le cas "disabled"
                                     break;
                             }
                         }
@@ -109,23 +111,22 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                             $timePassed .= "<1 min";
                         }
 
-                        echo "<tr class=\"tr_status\" style=\"background-color: $color_status; color: $font_color;\">
-                    <td>" . $row["username"] . " <span class=\"dot\" style=\"background-color: $color;\"></span></td>
-                    <td>" . $timePassed . "</td>
-                    <td>" . $row["userId"] . "</td>
-                    <td>
-            <div class='dropdown'>
-                <div class='ellipsis'>&#8942;</div>
-                    <div class='dropdown-content'>
-                        <a class='dropdown_one' href='#'>Enabled/Disabled</a>
-                        <a class='dropdown_two' href='#'>Edit</a>
-                        <a  class='dropdown_three' href='#'>Delete</a>
+                        echo "<tr class='tr_status' style='background-color: $color_status; color: $font_color;'>
+                    <td>" . $row["username"] .
+                            "<span class='dot' style='background-color: $color;'></span>
+                    </td><td>" . $timePassed . "</td><td>" . $row["userId"] . "</td><td>
+                    <div class='dropdown'>
+                        <div class='ellipsis'>&#8942;</div>
+                            <div class='dropdown-content'>
+                            <a class='dropdown_one status_button' data-id='" . $row["userId"] . "' data-idStatus='" . $row['status']['idStatus'] . "'>Enabled/Disabled</a>
+                            <a class='log_button' data-id='" . $row["userId"] . "'>Log</a>
+                                <a class='edit_button' href='#'>Edit</a>
+                                <a class='dropdown_three delete_button' href='#' data-id='" . $row["userId"] . " data-idStatus='" . $row['status']['idStatus'] . "'><span class='text_delete'>Delete</span></a> 
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
                     </td>
                 </tr>";
-
                     }
                     echo "</table>";
                 } else {
@@ -159,63 +160,175 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                     echo auth\registerUser($username, $password) ? " <br>Successfull registration" : "<br>Registration failed";
                 }
+
                 ?>
 
             </div>
         </div>
     </div>
 
+    <!-- Fenêtre modale
+    <div id=" myModal" class="modal">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="closeModal()">&times;</span>
+                                        <h2>Titre de la fenêtre modale</h2>
+
+                                    </div>
+                            </div> -->
+
+
     <script>
-        function openModal(element) {
-            var modal = element.nextElementSibling;
-            modal.style.display = "block";
-        }
+        const statusButtons = document.querySelectorAll('.status_button');
+        const logButtons = document.querySelectorAll('.log_button');
+        const editButtons = document.querySelectorAll('.edit_button');
+        const deleteButtons = document.querySelectorAll('.delete_button');
 
-        function closeModal(element) {
-            var modal = element.parentNode.parentNode;
-            modal.style.display = "none";
-        }
 
-        function handleOption(element) {
-            var modal = element.parentNode;
-            var selectedOption = modal.querySelector(".optionSelect").value;
+        // DELETE USER 
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Pour éviter de suivre le lien
 
-            // Gérer l'action en fonction de l'option sélectionnée
-            if (selectedOption === "enabled/disabled") {
-                // Traitement pour l'option Enabled/Disabled
-                console.log("Option Enabled/Disabled selected");
-            } else if (selectedOption === "edit") {
-                // Traitement pour l'option Edit
-                console.log("Option Edit selected");
-            } else if (selectedOption === "delete") {
-                // Traitement pour l'option Delete
-                console.log("Option Delete selected");
+                const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
+                fetch('backend.php?page=deleteUser&userId=' + userId);
+                location.reload()
+            });
+        });
+
+        // UPDATE USERS STATUS 
+        statusButtons.forEach(button => {
+
+            button.addEventListener('click', function(event) {
+                //event.preventDefault();
+                const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
+                const idStatus = button.getAttribute('data-idStatus');
+
+                function setStatus(status) {
+                    button.setAttribute('data-idStatus', status)
+                    fetch('backend.php?page=updateStatus&userId=' + userId + ' &idStatus=' + status);
+                    location.reload()
+                }
+
+                switch (idStatus) {
+                    case '3':
+                        setStatus(2);
+                        break;
+                    default:
+                        setStatus(3);
+                        break;
+                }
+
+
+                // location.reload()
+            });
+        });
+
+        logButtons.forEach(button => {
+            const userId = button.getAttribute('data-id');
+            console.log(userId)
+            button.addEventListener('click', function(event) {
+                fetch(`backend.php?page=logs&id=${userId}&modeUser=true`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.debug(data);
+                        if (data.logs.length > 0) {
+                            const history = new HistoryResellers(data.logs);
+                            history.createGrid();
+                        } else {
+                            createNotification("No history");
+                        }
+                    });
+            });
+        });
+        /**
+         * Crée une notification et l'ajoute à l'interface utilisateur.
+         * @param {string} text - Texte de la notification.
+         */
+        function createNotification(text) {
+            var notificationsContainer = document.getElementById(
+                "notifications-container"
+            );
+            if (!notificationsContainer) {
+                notificationsContainer = document.createElement("div");
+                notificationsContainer.id = "notifications-container";
+                notificationsContainer.style.display = "flex";
+                notificationsContainer.style.flexDirection = "column";
+                notificationsContainer.style.position = "fixed";
+                notificationsContainer.style.bottom = "60px";
+                notificationsContainer.style.right = "20px";
+                document.body.appendChild(notificationsContainer);
             }
+            const notification = document.createElement("div");
+            notification.textContent = text;
 
-            // Fermer la fenêtre modale après traitement
-            closeModal(element);
+            notification.style.padding = "10px";
+            notification.style.backgroundColor = "#007bff";
+            notification.style.color = "#fff";
+            notification.style.borderRadius = "5px";
+            notification.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
+            notification.style.cursor = "pointer";
+            notification.style.opacity = "0";
+            notification.style.transition = "opacity 0.4s ease";
+            notification.style.marginBottom = "5px";
+
+            notificationsContainer.insertBefore(
+                notification,
+                notificationsContainer.firstChild
+            );
+
+            setTimeout(function() {
+                notification.style.opacity = "1";
+            }, 100);
+
+            setTimeout(function() {
+                notification.style.opacity = "0";
+                setTimeout(function() {
+                    notification.parentNode.removeChild(notification);
+                }, 300);
+            }, 3000);
         }
 
-        function setStatus(userId, statusId) {
-            const data_tmp = { id: userId, statusId: statusId }
-            fetch("backend.php?page=userpage", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ modifiedData: data_tmp }),
-            })
-        }
-        const optionsSelect = document.getElementById('optionsSelect');
-        const options = optionsSelect.options;
-        for (let i = 0; i < options.length; i++) {
-            const option = options[i];
-            console.log(option.value);
-        }
+
+        // // UPDATE USERS DATA 
+        // editButtons.forEach(button => {
+        //     button.addEventListener('click', function (event) {
+        //         event.preventDefault();
+
+        //         openModal();
+
+
+        //         const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
+        //         fetch('backend.php?page=modifiedStatus&userId=' + userId);
+        //         location.reload()
+        //     });
+        // });
+
+
+
+        // // Fonction pour ouvrir la fenêtre modale
+        // function openModal() {
+        //     var modal = document.getElementById('myModal');
+        //     modal.style.display = 'block';
+        // }
+
+        // // Fonction pour fermer la fenêtre modale
+        // function closeModal() {
+        //     var modal = document.getElementById('myModal');
+        //     modal.style.display = 'none';
+        // }
+
+        // // Fermer la fenêtre modale lorsque l'utilisateur clique en dehors du contenu
+        // window.onclick = function (event) {
+        //     var modal = document.getElementById('myModal');
+        //     if (event.target === modal) {
+        //         modal.style.display = 'none';
+        //     }
+        // };
     </script>
+
     <script>
         const homeButton = document.getElementById("homeButton");
-        homeButton.addEventListener("click", function () {
+        homeButton.addEventListener("click", function() {
             document.location.pathname = "/";
         });
     </script>

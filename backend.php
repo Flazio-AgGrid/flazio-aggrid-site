@@ -13,6 +13,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 require_once "./backend/grid.php";
 require_once "./backend/logs.php";
 
+// fetch('backend.php?page=??&userId=?')
 $page = $_GET['page'] ?? '';
 
 // Définir les routes
@@ -21,8 +22,7 @@ switch ($page) {
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
             if (auth\checkLogin())
                 echo grid\get_reseller_category();
-        }
-        else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (auth\checkLogin())
                 echo grid\update_reseller_category();
         }
@@ -32,8 +32,7 @@ switch ($page) {
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
             if (auth\checkLogin())
                 echo grid\get_manually_reseller_category();
-        }
-        else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (auth\checkLogin())
                 echo grid\update_manually_reseller_category();
         }
@@ -43,15 +42,14 @@ switch ($page) {
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
             echo auth\checkLogin();
-        }
-        else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (auth\checkLogin()) {
                 // Récupérer les données modifiées depuis la requête POST
-                $jsonData     = file_get_contents('php://input');
+                $jsonData = file_get_contents('php://input');
                 $modifiedData = json_decode($jsonData, true);
-                $row          = $modifiedData['modifiedData'];
-                $userId       = $row["id"];
-                $statusId     = $row['statusId'];
+                $row = $modifiedData['modifiedData'];
+                $userId = $row["id"];
+                $statusId = $row['statusId'];
                 echo auth\modifiedStatus($userId, $statusId);
             }
         }
@@ -68,6 +66,21 @@ switch ($page) {
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
             if (auth\checkLogin()) {
                 echo log\get_log_by_id($_GET['id']);
+            }
+        }
+        break;
+    case 'deleteUser':
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            if (auth\checkLogin()) {
+                echo auth\deleteUser($_GET['userId']);
+            }
+        }
+        break;
+    case 'updateStatus':
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            if (auth\checkLogin()) {
+                var_dump($_GET['userId'], $_GET['idStatus']);
+                echo auth\modifiedStatus($_GET['userId'], $_GET['idStatus']);
             }
         }
         break;

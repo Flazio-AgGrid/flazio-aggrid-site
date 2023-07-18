@@ -371,7 +371,8 @@ function checkOnline()
 {
     global $mysqli;
 
-    $updateSql = "UPDATE users SET STATUS = CASE WHEN TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 10 OR token IS NULL THEN 1 ELSE 0 END, token = CASE WHEN STATUS = 1 AND TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 30 THEN NULL ELSE token END;";
+    $updateSql = "UPDATE users SET STATUS = CASE WHEN TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 10 OR token IS NULL THEN 1 ELSE 0 END,
+    token = CASE WHEN STATUS = 1 AND TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 30 THEN NULL ELSE token END;";
     try {
         $stmt = $mysqli->prepare($updateSql);
         $stmt->execute();
@@ -383,18 +384,19 @@ function checkOnline()
     }
 }
 
-function modifiedStatus($userId, $statusId)
+function modifiedStatus($userId, $idStatus)
 {
     global $mysqli;
 
+    //$updateSql = "UPDATE users SET status = ? CASE WHEN status IN (0, 1, 2) THEN 3 WHEN status = 3 THEN 2 ELSE status END WHERE id = ?;";
     $updateSql = "UPDATE users SET status = ? WHERE id = ?";
+
     try {
         $stmt = $mysqli->prepare($updateSql);
-        $stmt->bind_param("ii", $statusId, $userId);
+        $stmt->bind_param("ii", $idStatus, $userId);
         $stmt->execute();
-        $rowCount = $stmt->affected_rows;
         $stmt->close();
-        return $rowCount === 1 ? true : false;
+        return true;
     } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
@@ -429,7 +431,8 @@ function get_log_by_id($id)
 {
     global $mysqli;
 
-    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime,newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
+    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime,newData FROM log l 
+    INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
 
     try {
         $stmt = $mysqli->prepare($getLogSql);
@@ -472,3 +475,55 @@ function set_log($status, $initiator, $objectToLog, $newData)
         return false;
     }
 }
+
+function deleteUser($userId)
+{
+    global $mysqli;
+
+    // Requête pour supprimer l'utilisateur avec l'ID donné
+    $deleteSql = "DELETE FROM users WHERE id = ?";
+
+    try {
+        // Préparer la requête
+        $stmt = $mysqli->prepare($deleteSql);
+
+        // Lier le paramètre de l'ID de l'utilisateur
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->close();
+        return true; // La suppression a réussi
+
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false; // La suppression a échoué en raison d'une erreur
+    }
+}
+
+// function update_statusId($userId, $statusId)
+// {
+//     global $mysqli;
+
+//     $updateSql = "UPDATE users
+//     SET status = $statusId
+//         CASE 
+//             WHEN status IN (0, 1, 2) THEN 3
+//             WHEN status = 3 THEN 2
+//             ELSE status
+//         END
+//     WHERE id = userId; ";
+
+//     try {
+//         // Préparer la requête
+//         $stmt = $mysqli->prepare($updateSql);
+
+//         // Lier le paramètre de l'ID de l'utilisateur
+//         $stmt->bind_param("i", $userId);
+//         $stmt->execute();
+//         $stmt->close();
+//         return true;
+
+//     } catch (\Throwable $th) {
+//         echo "Une erreur s'est produite : " . $th->getMessage();
+//         return false; // La suppression a échoué en raison d'une erreur
+//     }
+// }
