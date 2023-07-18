@@ -32,7 +32,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 <body>
     <?php
     // date_default_timezone_set("Europe/Paris");
-    echo  date('Y-m-d H:i:s'); ?>
+    echo date('Y-m-d H:i:s'); ?>
     <div id="page">
         <div class="box_table_all_user">
 
@@ -62,14 +62,13 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                     foreach ($result as $row) {
                         $color_status = ""; // Variable pour stocker la couleur de fond
-                        $color        = ""; // Variable pour stocker la couleur de l'élément dot
-                        $font_color   = ""; // Variable pour stocker la couleur de la police
+                        $color = ""; // Variable pour stocker la couleur de l'élément dot
+                        $font_color = ""; // Variable pour stocker la couleur de la police
                 
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
-                            $font_color   = "#00000045";
-                        }
-                        else {
+                            $font_color = "#00000045";
+                        } else {
                             switch ($row['status']['idStatus']) {
                                 case 0:
                                     $color = "#27c500"; // Couleur pour le cas "connected"
@@ -93,8 +92,8 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                         // Calculer le nombre de minutes, hours  ou days passés
                         $minutes = floor($diff / 60);
-                        $hours   = floor($diff / 3600);
-                        $days    = floor($diff / 86400);
+                        $hours = floor($diff / 3600);
+                        $days = floor($diff / 86400);
 
                         // Construire le résultat dans le format souhaité
                         $timePassed = "";
@@ -106,8 +105,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         }
                         if ($minutes > 0) {
                             $timePassed .= ($minutes % 60) . " minute(s) ";
-                        }
-                        else {
+                        } else {
                             $timePassed .= "<1 min";
                         }
 
@@ -116,40 +114,21 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     <td>" . $timePassed . "</td>
                     <td>" . $row["userId"] . "</td>
                     <td>
-                        <div class='ellipsis' onclick='openModal(this)'>&#8942;</div>
-                        <div class='modal'>
-                            <div class='modal-content'>
-                                <span class='close' onclick='closeModal(this)'>&times;</span>
-                                <p>Select an option:</p>
-                                <select class='optionSelect'>
-                                    <option value=''></option>
-                                    <option value='enabled/disabled'>Enabled/Disabled</option>
-                                    <option value='edit'>Edit</option>
-                                    <option value='delete'>Delete</option>
-                                </select>
-                                <button class='white_button' onclick='handleOption(this)'>Submit</button>
-                            </div>
-                        </div>
+            <div class='dropdown'>
+                <div class='ellipsis'>&#8942;</div>
+                    <div class='dropdown-content'>
+                        <a class='dropdown_one' href='#'>Enabled/Disabled</a>
+                        <a class='dropdown_two' href='#'>Edit</a>
+                        <a  class='dropdown_three' href='#'>Delete</a>
+                    </div>
+                </div>
+            </div>
                     </td>
                 </tr>";
 
-
-                        ?>
-                        <div id="optionsMenu" style="display: none;">
-                            <select id="optionsSelect">
-                                <option value="activate">Activer</option>
-                                <option value="deactivate">Désactiver</option>
-                                <option value="edit">Modifier</option>
-                                <option value="delete">Supprimer</option>
-                            </select>
-                        </div>
-
-                        <?php
-
                     }
                     echo "</table>";
-                }
-                else {
+                } else {
                     echo "<p class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</p>";
                 }
 
@@ -178,7 +157,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     $username = $_POST['username'];
                     $password = $_POST['password'];
 
-                    echo auth\registerUser($username, $password) ? "Successfull registration" : "Registration failed";
+                    echo auth\registerUser($username, $password) ? " <br>Successfull registration" : "<br>Registration failed";
                 }
                 ?>
 
