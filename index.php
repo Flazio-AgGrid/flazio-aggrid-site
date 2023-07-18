@@ -51,7 +51,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js">
     </script>
-    <script src="main.js">
+    <script src="main.js" type="module">
     </script>
 </body>
 

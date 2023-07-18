@@ -10,13 +10,24 @@ require_once 'db.php';
  */
 function get_log_all()
 {
-    $log = \db\get_log_all();
-    if ($log) {
-        return $log;
+    $result_data = \db\get_log_all();
+
+    $data = array();
+
+    while ($row = $result_data->fetch_assoc()) {
+        // Ajouter chaque ligne de résultat au tableau
+        $data[] = $row;
     }
-    else {
-        return false;
-    }
+
+    $finalData = array(
+        "logs" => $data
+    );
+
+    // Convertir le tableau en JSON
+    $jsonData = json_encode($finalData);
+
+    // Retourner les données au format JSON
+    return $jsonData;
 }
 
 /**
@@ -27,13 +38,23 @@ function get_log_all()
  */
 function get_log_by_id($id)
 {
-    $log = \db\get_log_by_id($id);
-    if ($log) {
-        return $log;
+    $result_data = \db\get_log_by_id($id);
+    $data        = array();
+
+    while ($row = $result_data->fetch_assoc()) {
+        // Ajouter chaque ligne de résultat au tableau
+        $data[] = $row;
     }
-    else {
-        return false;
-    }
+
+    $finalData = array(
+        "logs" => $data
+    );
+
+    // Convertir le tableau en JSON
+    $jsonData = json_encode($finalData);
+
+    // Retourner les données au format JSON
+    return $jsonData;
 }
 
 /**

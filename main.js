@@ -1,3 +1,5 @@
+import HistoryResellers from "./history";
+
 const gridOptions = {
   columnDefs: [
     { field: "id", filter: "agTextColumnFilter" },
@@ -42,6 +44,37 @@ const gridOptions = {
     resizable: true,
   },
   sideBar: true,
+  // Configuration du contextMenu personnalisé
+  getContextMenuItems: (params) => {
+    var customMenuItems = [
+      {
+        name: "History",
+        action: async () => {
+          const selectedRow = params.node.data;
+
+          fetch(`backend.php?page=logs&id=${selectedRow.id}`)
+            .then((response) => response.json())
+            .then((data) => {
+              console.debug(data);
+              if (data.logs.length > 0) {
+                const history = new HistoryResellers(data.logs);
+                history.createGrid();
+              } else {
+                createNotification("No history");
+              }
+            });
+        },
+      },
+    ];
+
+    // Récupérer les éléments du menu par défaut d'Ag-Grid
+    var defaultItems = params.defaultItems;
+
+    // Combinez les éléments du menu personnalisés avec les éléments par défaut
+    var allMenuItems = customMenuItems.concat("separator", defaultItems);
+
+    return allMenuItems;
+  },
 };
 
 var category = {};
@@ -64,6 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("backend.php?page=index")
     .then((response) => response.json())
     .then((data) => {
+      console.debug(data);
       // Stocker les catégories dans une variable globale
       category = data.category;
 

@@ -11,6 +11,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 ?>
 <?php
 require_once "./backend/grid.php";
+require_once "./backend/logs.php";
 
 $page = $_GET['page'] ?? '';
 
@@ -63,9 +64,14 @@ switch ($page) {
             }
         }
         break;
+    case 'logs':
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            if (auth\checkLogin()) {
+                echo log\get_log_by_id($_GET['id']);
+            }
+        }
+        break;
     default:
-        // Route par défaut pour les pages non définies
-        header('Location: ../auth/erreur.php');
         break;
 }
 ?>

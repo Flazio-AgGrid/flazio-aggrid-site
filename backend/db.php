@@ -388,7 +388,7 @@ function checkOnline()
 {
     global $mysqli;
 
-    $updateSql = "UPDATE users SET STATUS = CASE WHEN TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 10 OR token IS NULL THEN 1 ELSE 0 END, token = CASE WHEN STATUS = 1 THEN NULL ELSE token END;";
+    $updateSql = "UPDATE users SET STATUS = CASE WHEN TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 10 OR token IS NULL THEN 1 ELSE 0 END, token = CASE WHEN STATUS = 1 AND TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 30 THEN NULL ELSE token END;";
     try {
         $stmt = $mysqli->prepare($updateSql);
         $stmt->execute();
@@ -449,7 +449,7 @@ function get_log_by_id($id)
 {
     global $mysqli;
 
-    $getLogSql = "SELECT l.id, initiator, objectToLog, l.status FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
+    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime,newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
 
     try {
         $stmt = $mysqli->prepare($getLogSql);
