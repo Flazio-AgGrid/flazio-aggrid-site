@@ -22,9 +22,10 @@
         <form method="POST" action="login.php">
 
           <div class="space"></div>
-          <input placeholder="Username" class="input" id="username" name="username" type="text" required="">
+          <input placeholder="Username" class="input" name="username" type="text" required autocomplete="username">
           <div class="space"></div>
-          <input placeholder="Password" class="input" id="password" name="password" type="password" required="">
+          <input placeholder="Password" class="input" name="password" type="password" required
+            autocomplete="current-password">
           <div class="space"></div>
           <input id="button_submit" class="button_white" type="submit" name="button_submit" value="Login">
         </form>
