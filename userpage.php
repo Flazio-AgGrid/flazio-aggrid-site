@@ -60,10 +60,10 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         </tr>";
 
                     foreach ($result as $row) {
-                        $color_status = "";
-                        $color        = "";
-                        $font_color   = "";
-
+                        $color_status = ""; // Variable pour stocker la couleur de fond
+                        $color = ""; // Variable pour stocker la couleur de l'élément dot
+                        $font_color = ""; // Variable pour stocker la couleur de la police
+                
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
                             $font_color   = "#00000045";
@@ -109,19 +109,21 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         }
 
                         echo "<tr class='tr_status' style='background-color: $color_status; color: $font_color;'>
-                                <td>" . $row["username"] . "<span class='dot' style='background-color: $color;'></span>
-                                </td><td>" . $timePassed . "</td><td>" . $row["userId"] . "</td><td>
-                                <div class='dropdown'>
-                                    <div class='ellipsis'>&#8942;</div>
-                                    <div class='dropdown-content'>
-                                        <a class='dropdown_one status_button' data-id='" . $row["userId"] . "' data-idStatus='" . $row['status']['idStatus'] . "'>Enabled/Disabled</a>
-                                        <a class='log_button' data-id='" . $row["userId"] . "'>Log</a>
-                                        <a class='edit_button' href='#'>Edit</a>
-                                        <a class='dropdown_three delete_button' href='#' data-id='" . $row["userId"] . "' data-idStatus='" . $row['status']['idStatus'] . "'><span class='text_delete'>Delete</span></a> 
-                                    </div>
-                                </div>
-                                </td>
-                            </tr>";
+                    <td>" . $row["username"] .
+                            "<span class='dot' style='background-color: $color;'></span>
+                    </td><td>" . $timePassed . "</td><td>" . $row["userId"] . "</td><td>
+                    <div class='dropdown'>
+                        <div class='ellipsis'>&#8942;</div>
+                            <div class='dropdown-content'>
+                            <a class='dropdown_one status_button' href='#' data-id='" . $row["userId"] . "' data-idStatus='" . $row['status']['idStatus'] . "'>Enabled/Disabled</a>
+                            <a class='log_button' href='#' data-id='" . $row["userId"] . "'>Log</a>
+                                <a class='edit_button' href='#'>Edit</a>
+                                <a class='dropdown_three delete_button' href='#' data-id='" . $row["userId"] . " data-idStatus='" . $row['status']['idStatus'] . "'><span class='text_delete'>Delete</span></a> 
+                            </div>
+                        </div>
+                    </div>
+                    </td>
+                </tr>";
                     }
 
                     echo "</table>";
@@ -160,14 +162,13 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         </div>
     </div>
 
-    <!-- Fenêtre modale
-    <div id="myModal" class="modal">
+    <div id=" myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h2>Titre de la fenêtre modale</h2>
+
         </div>
     </div>
-    -->
 
     <script src="history.js" type="module"></script>
     <script type="module">
@@ -179,7 +180,8 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         // DELETE USER 
         deleteButtons.forEach(button => {
             button.addEventListener('click', function (event) {
-                event.preventDefault();
+                event.preventDefault(); // Pour éviter de suivre le lien
+
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 fetch('backend.php?page=deleteUser&userId=' + userId);
                 location.reload();
@@ -188,8 +190,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
         // UPDATE USERS STATUS 
         statusButtons.forEach(button => {
+
             button.addEventListener('click', function (event) {
-                event.preventDefault();
+                //event.preventDefault();
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 const idStatus = button.getAttribute('data-idStatus');
 
@@ -270,6 +273,45 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
             }, 3000);
         }
 
+
+        // UPDATE USERS DATA 
+        editButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                console.log("je oui")
+                openModal();
+
+
+                // const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
+                // fetch('backend.php?page=modifiedStatus&userId=' + userId);
+                // location.reload()
+            });
+        });
+
+
+
+        // Fonction pour ouvrir la fenêtre modale
+        function openModal() {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'block';
+        }
+
+        // Fonction pour fermer la fenêtre modale
+        function closeModal() {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+
+        // Fermer la fenêtre modale lorsque l'utilisateur clique en dehors du contenu
+        window.onclick = function (event) {
+            var modal = document.getElementById('myModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+
+    <script>
         const homeButton = document.getElementById("homeButton");
         homeButton.addEventListener("click", function () {
             document.location.pathname = "/";

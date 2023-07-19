@@ -11,8 +11,7 @@ require_once 'db.php';
  */
 function get_log_by_id($id, $modeUser)
 {
-    $aa = $modeUser ? \db\get_log_by_reseller_id($id) : \db\get_log_by_user_id($id);
-    $result_data = $aa;
+    $result_data = $modeUser ? \db\get_log_by_user_id($id) : \db\get_log_by_reseller_id($id);
     $data = array();
 
     while ($row = $result_data->fetch_assoc()) {
