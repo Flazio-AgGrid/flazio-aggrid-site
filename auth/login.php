@@ -17,7 +17,7 @@
   <div id="page_login">
     <div class="box_user_management">
       <h1 class="title_box">Connection</h1>
-      <div class="box_user_management_content">
+      <div class="box_user_management_content box_user_management_login">
 
         <form method="POST" action="login.php">
 

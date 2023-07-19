@@ -23,8 +23,12 @@ h3 {
     font-weight: bold;
 }
 
+h2 {
+    margin-bottom: 2vh;
+}
+
 .box_table_all_user {
-    width: 120vh;
+    width: 70vw;
     margin: 5vh 3vh 5vh 5vh;
     justify-content: center;
     border-radius: 50px;
@@ -50,8 +54,8 @@ table {
 }
 
 .box_user_management {
-    height: 60vh;
-    width: 60vh;
+    height: auto;
+    width: 35vw;
     margin: 5vh 5vh 5vh 3vh;
     border-radius: 50px;
     background: #e6e6e6;
@@ -62,6 +66,9 @@ table {
     text-align: center;
 }
 
+.box_user_management_login {
+    height: 45vh;
+}
 
 
 
@@ -158,8 +165,9 @@ button#button_box_user {
 }
 
 #button_submit {
-    width: 10vw;
+    width: 12vw;
 }
+
 
 /* ------------------------Botton management user ------------------------------------- */
 
@@ -183,19 +191,23 @@ button#button_box_user {
     position: absolute;
     top: 50%;
     left: 50%;
+    min-height: 30vh;
+    height: auto;
+    min-width: 35vw;
+    width: auto;
     transform: translate(-50%, -50%);
     background-color: white;
-    padding: 20px;
-    border-radius: 5px;
+    padding: 50px;
+    border-radius: 50px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Style pour le bouton de fermeture (X) */
 .close {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 20px;
+    top: 7%;
+    right: 7%;
+    font-size: 30px;
     cursor: pointer;
 }
 
@@ -211,6 +223,24 @@ span.material-symbols-outlined:active {
 }
 
 
+#title_box_modal {
+    margin-top: 0;
+    display: flex;
+}
+
+.modal_span {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.submit_udapte_user {
+    display: flex;
+    justify-content: center;
+}
+
+/* ------------------------ Modal ------------------------------------- */
+
 
 .ellipsis {
     font-weight: bold;
@@ -218,8 +248,6 @@ span.material-symbols-outlined:active {
     cursor: pointer;
     padding-inline: 2vw;
 }
-
-/* ------------------------ Modal ------------------------------------- */
 
 .no_data_error {
     text-align: center;
@@ -306,4 +334,8 @@ a#button_submit {
 .text_delete {
     color: #ff0000;
     font-weight: bold;
+}
+
+select#role {
+    width: 59%;
 }

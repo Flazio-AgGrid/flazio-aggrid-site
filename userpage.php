@@ -131,7 +131,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     }
                     echo "</table>";
                 } else {
-                    echo "<p class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</p>";
+                    echo "<span class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</p>";
                 }
 
                 if (isset($_POST['button_submit'])) {
@@ -149,10 +149,17 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 <form method="POST" action="userpage.php">
 
                     <input placeholder="Username" class="input" id="username" name="username" type="text" required>
+                    <!-- Future feature -->
+                    <!-- <select placeholder="Role" class="input" id="role" name="role" required>
+                        <option value="0">Read-Only</option>  
+                        <option value="1">Read-Write</option>  
+                        <option value="2">Admin</option> 
+                    </select> -->
                     <input placeholder="Password" class="input" id="password" name="password" type="password" required>
                     <input id="button_submit" class="button_white" type="submit" name="button_submit" value="Register">
                 </form>
                 <input id="homeButton" class="button_white" type="button" name="homeButton" value="Return to home">
+                <div class="space"></div>
                 <?php
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Récupérer les données du formulaire d'inscription
@@ -168,13 +175,29 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         </div>
     </div>
 
-    <div id=" myModal" class="modal">
+
+    <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Titre de la fenêtre modale</h2>
+            <h1 class="title_box" id="title_box_modal">Edit User Data</h1> <br>
+
+            <?php
+            echo "<form>";
+            echo "<span class='modal_span'><i>Username: " . $row["username"] . '</i>' . "<input placeholder='Username' class='input' id='username' name='username' type='text' required=''></span> <br> ";
+
+            //Future feature
+            // echo "<span class='modal_span'><i>Role: " . $row["username"] . '</i>' . "<input placeholder='Role' class='input' id='role' name='role' type='text' required=''></span> <br> ";
+            
+            echo "<span class='modal_span'><i>New Password: </i>" . "<input placeholder='Password' class='input' id='password' name='password' type='text' required=''></span> <br>";
+
+            echo "<div class='submit_udapte_user'>";
+            echo "<input id='button_submit' class='button_white' type='submit' name='button_submit' value='Register'>";
+            echo "</div></form>";
+            ?>
 
         </div>
     </div>
+
 
 
     <script>
@@ -236,11 +259,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         }
                     });
             });
-        });
-        /**
-         * Crée une notification et l'ajoute à l'interface utilisateur.
-         * @param {string} text - Texte de la notification.
-         */
+        });         /**          * Crée une notification et l'ajoute à l'interface utilisateur.          * @param {string} text - Texte de la notification.          */
         function createNotification(text) {
             var notificationsContainer = document.getElementById(
                 "notifications-container"
@@ -260,6 +279,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
             notification.style.padding = "10px";
             notification.style.backgroundColor = "#007bff";
+            notification.style.paddingInline = "2vh";
             notification.style.color = "#fff";
             notification.style.borderRadius = "5px";
             notification.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
@@ -321,6 +341,8 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 modal.style.display = 'none';
             }
         };
+
+
     </script>
 
     <script>
