@@ -11,8 +11,9 @@ require_once 'db.php';
  */
 function get_log_by_id($id, $modeUser)
 {
-    $result_data = $modeUser ? \db\get_log_by_reseller_id($id) : \db\get_log_by_reseller_id($id);
-    $data        = array();
+    $aa = $modeUser ? \db\get_log_by_reseller_id($id) : \db\get_log_by_user_id($id);
+    $result_data = $aa;
+    $data = array();
 
     while ($row = $result_data->fetch_assoc()) {
         // Ajouter chaque ligne de résultat au tableau
@@ -51,18 +52,16 @@ function set_log($status, $initiator, $objectId, $arrayNewData)
             $result->data_seek($result->num_rows - 1);
 
             // Récupérer la dernière ligne
-            $row         = $result->fetch_assoc();
+            $row = $result->fetch_assoc();
             $jsonOldData = $row['newData'];
-        }
-        else {
+        } else {
             $jsonOldData = NULL;
         }
 
         \db\set_log($status, $initiator, $objectId, $jsonOldData, json_encode($arrayNewData));
         return true;
 
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         return false;
     }
 }
