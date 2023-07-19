@@ -66,9 +66,8 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
-                            $font_color   = "#00000045";
-                        }
-                        else {
+                            $font_color = "#00000045";
+                        } else {
                             switch ($row['status']['idStatus']) {
                                 case 0:
                                     $color = "#27c500";
@@ -86,13 +85,13 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         }
 
                         $lastConnection = $row["lastConnection"];
-                        $timestamp      = strtotime($lastConnection);
-                        $now            = time();
+                        $timestamp = strtotime($lastConnection);
+                        $now = time();
 
-                        $diff    = $now - $timestamp;
+                        $diff = $now - $timestamp;
                         $minutes = floor($diff / 60);
-                        $hours   = floor($diff / 3600);
-                        $days    = floor($diff / 86400);
+                        $hours = floor($diff / 3600);
+                        $days = floor($diff / 86400);
 
                         $timePassed = "";
                         if ($days > 0) {
@@ -103,8 +102,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         }
                         if ($minutes > 0) {
                             $timePassed .= ($minutes % 60) . " minute(s) ";
-                        }
-                        else {
+                        } else {
                             $timePassed .= "<1 min";
                         }
 
@@ -195,6 +193,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         import HistoryResellers from "./history";
         const statusButtons = document.querySelectorAll('.status_button');
         const logButtons = document.querySelectorAll('.log_button');
+        const editButtons = document.querySelectorAll('.edit_button');
         const deleteButtons = document.querySelectorAll('.delete_button');
 
         // DELETE USER 
@@ -299,7 +298,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         editButtons.forEach(button => {
             button.addEventListener('click', function (event) {
                 event.preventDefault();
-                console.log("je oui")
+
                 openModal();
 
 
