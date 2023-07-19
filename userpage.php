@@ -19,8 +19,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Flazio</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js"></script>
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -63,7 +62,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         $color_status = ""; // Variable pour stocker la couleur de fond
                         $color = ""; // Variable pour stocker la couleur de l'élément dot
                         $font_color = ""; // Variable pour stocker la couleur de la police
-                
+
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
                             $font_color = "#00000045";
@@ -115,8 +114,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                             <div class='dropdown-content'>
                             <a class='dropdown_one status_button' href='#' data-id='" . $row["userId"] . "' data-idStatus='" . $row['status']['idStatus'] . "'>Enabled/Disabled</a>
                             <a class='log_button' href='#' data-id='" . $row["userId"] . "'>Log</a>
-                                <a class='edit_button' href='#'>Edit</a>
-                                <a class='dropdown_three delete_button' href='#' data-id='" . $row["userId"] . " data-idStatus='" . $row['status']['idStatus'] . "'><span class='text_delete'>Delete</span></a> 
+                            <a class='edit_button' href='#'>Edit</a>
+                            <a class='dropdown_three delete_button' href='#' data-id='" . $row["userId"] . " data-idStatus='" . $row['status']['idStatus'] . "'>
+                            <span class='text_delete'>Delete</span></a> 
                             </div>
                         </div>
                     </div>
@@ -126,7 +126,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                     echo "</table>";
                 } else {
-                    echo "<span class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</p>";
+                    echo "<span class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</span>";
                 }
 
                 if (isset($_POST['button_submit'])) {
@@ -139,7 +139,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         <div class="box_user_management">
             <h1 class="title_box">Add User</h1>
             <div class="box_user_management_content">
-                <form method="POST" action="userpage.php">
+                <form method="POST" action="backend.php?page=userpage&option=password">
                     <input placeholder="Username" class="input" id="username" name="username" type="text" required>
                     <!-- Future feature -->
                     <!-- <select placeholder="Role" class="input" id="role" name="role" required>
@@ -172,13 +172,13 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
             <h1 class="title_box" id="title_box_modal">Edit User Data</h1> <br>
 
             <?php
-            echo "<form>";
-            echo "<span class='modal_span'><i>Username: " . $row["username"] . '</i>' . "<input placeholder='Username' class='input' id='username' name='username' type='text' required=''></span> <br> ";
+            echo '<form method="POST" action="backend.php?page=userpage&option=password">';
+            echo "<span class='modal_span'><i>Username: " . $row["username"] . '</i>' . "<input placeholder='Username' class='input' id='username' name='username' type='text' ''></span> <br> ";
 
             //Future feature
-            // echo "<span class='modal_span'><i>Role: " . $row["username"] . '</i>' . "<input placeholder='Role' class='input' id='role' name='role' type='text' required=''></span> <br> ";
-            
-            echo "<span class='modal_span'><i>New Password: </i>" . "<input placeholder='Password' class='input' id='password' name='password' type='text' required=''></span> <br>";
+            // echo "<span class='modal_span'><i>Role: " . $row["username"] . '</i>' . "<input placeholder='Role' class='input' id='role' name='role' type='text' ''></span> <br> ";
+
+            echo "<span class='modal_span'><i>New Password: </i>" . "<input placeholder='Password' class='input' id='password' name='password' type='text' ''></span> <br>";
 
             echo "<div class='submit_udapte_user'>";
             echo "<input id='button_submit' class='button_white' type='submit' name='button_submit' value='Register'>";
@@ -198,7 +198,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
         // DELETE USER 
         deleteButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 event.preventDefault(); // Pour éviter de suivre le lien
 
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
@@ -210,14 +210,22 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         // UPDATE USERS STATUS 
         statusButtons.forEach(button => {
 
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 //event.preventDefault();
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 const idStatus = button.getAttribute('data-idStatus');
 
                 function setStatus(status) {
                     button.setAttribute('data-idStatus', status);
-                    fetch('backend.php?page=updateStatus&userId=' + userId + '&idStatus=' + status);
+                    fetch('backend.php?page=userpage&option=status', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            modifiedData: {
+                                userId: userId,
+                                idStatus: idStatus
+                            }
+                        })
+                    });
                     location.reload();
                 }
 
@@ -235,7 +243,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         logButtons.forEach(button => {
             const userId = button.getAttribute('data-id');
             console.log(userId)
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 fetch(`backend.php?page=logs&id=${userId}&modeUser=true`)
                     .then((response) => response.json())
                     .then((data) => {
@@ -281,13 +289,13 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
             notificationsContainer.insertBefore(notification, notificationsContainer.firstChild);
 
-            setTimeout(function () {
+            setTimeout(function() {
                 notification.style.opacity = "1";
             }, 100);
 
-            setTimeout(function () {
+            setTimeout(function() {
                 notification.style.opacity = "0";
-                setTimeout(function () {
+                setTimeout(function() {
                     notification.parentNode.removeChild(notification);
                 }, 300);
             }, 3000);
@@ -296,15 +304,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
         // UPDATE USERS DATA 
         editButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 event.preventDefault();
-
                 openModal();
-
-
-                // const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
-                // fetch('backend.php?page=modifiedStatus&userId=' + userId);
-                // location.reload()
             });
         });
 
@@ -323,19 +325,17 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         }
 
         // Fermer la fenêtre modale lorsque l'utilisateur clique en dehors du contenu
-        window.onclick = function (event) {
+        window.onclick = function(event) {
             var modal = document.getElementById('myModal');
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
         };
-
-
     </script>
 
     <script>
         const homeButton = document.getElementById("homeButton");
-        homeButton.addEventListener("click", function () {
+        homeButton.addEventListener("click", function() {
             document.location.pathname = "/";
         });
     </script>

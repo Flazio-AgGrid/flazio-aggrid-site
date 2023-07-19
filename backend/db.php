@@ -1,4 +1,5 @@
 <?php
+
 namespace db;
 
 use mysqli;
@@ -26,8 +27,7 @@ function get_reseller()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -46,8 +46,7 @@ function get_category()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -77,8 +76,7 @@ function get_verify_fk_lead_exists($row, $id, $id_cat)
         $stmt->close();
 
         return $count;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -102,8 +100,7 @@ function update_fk_lead($id, $id_cat)
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -124,8 +121,7 @@ function get_adress_reseller($id)
         $result          = $mysqli->query($query);
         $tableau_adresse = $result->fetch_all();
         return $tableau_adresse;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -164,8 +160,7 @@ function set_fake_maps_info($tableau)
         }
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -190,8 +185,7 @@ function get_username($username)
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->num_rows > 0 ? $result : false;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -217,14 +211,12 @@ function set_register($username, $hashedPassword)
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
 
         if ($th->getCode() === 1062) {
             echo "Nom d'utilisateur déjà utilisé.";
             return false;
-        }
-        else {
+        } else {
             echo "Une erreur s'est produite : " . $th->getMessage();
             return false;
         }
@@ -244,8 +236,7 @@ function get_reseller_set_manually()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -264,8 +255,7 @@ function get_status()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -286,8 +276,7 @@ function update_status_lead($id, $lead_status)
         $stmt->close();
 
         return $rowCount === 1 ? true : false;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -303,8 +292,7 @@ function get_alluserinfo()
     try {
         $result = $mysqli->query($query);
         return $result->num_rows > 0 ? $result : false;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -334,12 +322,10 @@ function validateAuthToken($userid, $token)
             $row     = $result->fetch_assoc();
             $dbToken = $row['token'];
             return $dbToken === $token;
-        }
-        else {
+        } else {
             return false;
         }
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -357,8 +343,7 @@ function saveAuthToken($userId, $token)
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -377,8 +362,7 @@ function keepAlive($userId)
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -395,8 +379,7 @@ function checkOnline()
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -406,18 +389,71 @@ function modifiedStatus($userId, $idStatus)
 {
     global $mysqli;
 
-    //$updateSql = "UPDATE users SET status = ? CASE WHEN status IN (0, 1, 2) THEN 3 WHEN status = 3 THEN 2 ELSE status END WHERE id = ?;";
     $updateSql = "UPDATE users SET status = ? WHERE id = ?";
 
     try {
         $stmt = $mysqli->prepare($updateSql);
-        $stmt->bind_param("ii", $idStatus, $userId);
+        $stmt->bind_param("ss", $idStatus, $userId);
         $stmt->execute();
         $rowCount = $stmt->affected_rows;
         $stmt->close();
         return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
     }
-    catch (\Throwable $th) {
+}
+function modifiedUsername($userId, $username)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET username  = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $username, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+function modifiedPassword($userId, $password)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET password  = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $password, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function modifiedRole($userId, $role)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET role  = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $role, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -440,8 +476,7 @@ function get_log_by_reseller_id($id)
         $stmt->execute();
         $result = $stmt->get_result();
         return $result;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -459,8 +494,7 @@ function get_log_by_user_id($id)
         $stmt->execute();
         $result = $stmt->get_result();
         return $result;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -490,8 +524,7 @@ function set_log($status, $initiator, $objectToLog, $oldData, $newData)
         $stmt->close();
 
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }

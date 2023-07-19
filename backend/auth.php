@@ -203,6 +203,21 @@ function modifiedStatus($userId, $idStatus)
     return \db\modifiedStatus($userId, $idStatus);
 }
 
+function modifiedUsername($userId, $idStatus)
+{
+    return \db\modifiedUsername($userId, $idStatus);
+}
+
+function modifiedPassword($userId, $password)
+{
+    return \db\modifiedPassword($userId, $password);
+}
+
+function modifiedRole($userId, $role)
+{
+    return \db\modifiedRole($userId, $role);
+}
+
 function registerUser($username, $password)
 {
     // Chiffrer le mot de passe
