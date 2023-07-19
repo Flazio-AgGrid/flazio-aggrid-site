@@ -117,12 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
       createNotification(
         `Erreur lors de l'envoi des données au backend: ${error}`
       );
-
-      // Afficher l'erreur dans le DOM
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 
   /**
@@ -362,6 +357,7 @@ async function logout() {
   } catch (error) {
     console.error(error);
     createNotification(error);
+    document.location.pathname = "/auth/login.php";
   }
 }
 /**
@@ -477,10 +473,7 @@ async function saveChangesToBackend() {
       createNotification(
         `Erreur lors de l'envoi des données au backend: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 
@@ -507,10 +500,7 @@ async function saveChangesToBackendAuto(data) {
       createNotification(
         `Erreur lors de l'envoi des données au backend: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 
@@ -548,10 +538,7 @@ function majDataFront(mode) {
       createNotification(
         `Erreur lors de la récupération des données: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 
@@ -671,10 +658,7 @@ function load_manually_reseller_category() {
       createNotification(
         `Erreur lors de la récupération des données: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 

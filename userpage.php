@@ -3,6 +3,7 @@
 session_start();
 
 require_once './backend/auth.php';
+
 // Vérifier si l'utilisateur est authentifié
 if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     // Rediriger vers une page d'erreur ou afficher un message d'erreur
@@ -10,6 +11,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     exit;
 }
 ?>
+
 <html lang="en">
 
 <head>
@@ -19,20 +21,21 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js"></script>
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <script src="history.js" type="module"></script>
 </head>
 
 <body>
     <?php
     // date_default_timezone_set("Europe/Paris");
-    echo date('Y-m-d H:i:s'); ?>
+    echo date('Y-m-d H:i:s');
+    ?>
+
     <div id="page">
         <div class="box_table_all_user">
-
             <div class="header_box_user">
                 <h1 id="title_box">User Management Menu</h1>
                 <button class="input" id="button_box_user" onclick="window.location.reload()">
@@ -42,20 +45,19 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
             <div class="table_all_user">
                 <?php
-
                 require_once './backend/auth.php';
+
                 // Appeler la fonction pour obtenir les informations de l'utilisateur
                 $result = \auth\get_alluserinfo();
 
                 if ($result) {
-                    // Affichage du tableau
                     echo "<table>
-                    <tr>
-                    <th><h2>Name</h2></th>
-                    <th><h2>Last Connection</h2></th>
-                    <th><h2>ID</h2></th>
-                    <th><h2>Option</h2></th>
-                    </tr>";
+                        <tr>
+                            <th><h2>Name</h2></th>
+                            <th><h2>Last Connection</h2></th>
+                            <th><h2>ID</h2></th>
+                            <th><h2>Option</h2></th>
+                        </tr>";
 
                     foreach ($result as $row) {
                         $color_status = ""; // Variable pour stocker la couleur de fond
@@ -64,41 +66,34 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 
                         if ($row['status']['idStatus'] == 3) {
                             $color_status = "#00000035";
-                            $font_color = "#00000045";
-                        } else {
+                            $font_color   = "#00000045";
+                        }
+                        else {
                             switch ($row['status']['idStatus']) {
                                 case 0:
-                                    $color = "#27c500"; // Couleur pour le cas "connected"
+                                    $color = "#27c500";
                                     break;
                                 case 1:
-                                    $color = "#ff0000"; // Couleur pour le cas "offline"
+                                    $color = "#ff0000";
                                     break;
                                 case 2:
-                                    $color = "#ffaa00"; // Couleur pour le cas "activated"
+                                    $color = "#ffaa00";
                                     break;
                                 case 3:
-                                    $color = "#000000"; // Couleur pour le cas "disabled"
+                                    $color = "#000000";
                                     break;
                             }
                         }
 
                         $lastConnection = $row["lastConnection"];
+                        $timestamp      = strtotime($lastConnection);
+                        $now            = time();
 
-                        // Convertir la date en timestamp
-                        $timestamp = strtotime($lastConnection);
-
-                        $now = time();
-
-
-                        // Calculer la différence en secondes
-                        $diff = $now - $timestamp;
-
-                        // Calculer le nombre de minutes, hours  ou days passés
+                        $diff    = $now - $timestamp;
                         $minutes = floor($diff / 60);
-                        $hours = floor($diff / 3600);
-                        $days = floor($diff / 86400);
+                        $hours   = floor($diff / 3600);
+                        $days    = floor($diff / 86400);
 
-                        // Construire le résultat dans le format souhaité
                         $timePassed = "";
                         if ($days > 0) {
                             $timePassed .= $days . " day(s) ";
@@ -108,7 +103,8 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         }
                         if ($minutes > 0) {
                             $timePassed .= ($minutes % 60) . " minute(s) ";
-                        } else {
+                        }
+                        else {
                             $timePassed .= "<1 min";
                         }
 
@@ -129,6 +125,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     </td>
                 </tr>";
                     }
+
                     echo "</table>";
                 } else {
                     echo "<span class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</p>";
@@ -137,9 +134,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 if (isset($_POST['button_submit'])) {
                     echo "<meta http-equiv='refresh' content='1'>";
                 }
-
                 ?>
-
             </div>
         </div>
 
@@ -147,7 +142,6 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
             <h1 class="title_box">Add User</h1>
             <div class="box_user_management_content">
                 <form method="POST" action="userpage.php">
-
                     <input placeholder="Username" class="input" id="username" name="username" type="text" required>
                     <!-- Future feature -->
                     <!-- <select placeholder="Role" class="input" id="role" name="role" required>
@@ -166,11 +160,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     $username = $_POST['username'];
                     $password = $_POST['password'];
 
-                    echo auth\registerUser($username, $password) ? " <br>Successfull registration" : "<br>Registration failed";
+                    auth\registerUser($username, $password) ? " <br>Successful registration" : "<br>Registration failed";
                 }
-
                 ?>
-
             </div>
         </div>
     </div>
@@ -198,14 +190,12 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         </div>
     </div>
 
-
-
-    <script>
+    <script src="history.js" type="module"></script>
+    <script type="module">
+        import HistoryResellers from "./history";
         const statusButtons = document.querySelectorAll('.status_button');
         const logButtons = document.querySelectorAll('.log_button');
-        const editButtons = document.querySelectorAll('.edit_button');
         const deleteButtons = document.querySelectorAll('.delete_button');
-
 
         // DELETE USER 
         deleteButtons.forEach(button => {
@@ -214,7 +204,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 fetch('backend.php?page=deleteUser&userId=' + userId);
-                location.reload()
+                location.reload();
             });
         });
 
@@ -227,17 +217,17 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 const idStatus = button.getAttribute('data-idStatus');
 
                 function setStatus(status) {
-                    button.setAttribute('data-idStatus', status)
-                    fetch('backend.php?page=updateStatus&userId=' + userId + ' &idStatus=' + status);
-                    location.reload()
+                    button.setAttribute('data-idStatus', status);
+                    fetch('backend.php?page=updateStatus&userId=' + userId + '&idStatus=' + status);
+                    location.reload();
                 }
 
                 switch (idStatus) {
                     case '3':
-                        setStatus(2);
+                        setStatus('2');
                         break;
                     default:
-                        setStatus(3);
+                        setStatus('3');
                         break;
                 }
             });
@@ -250,20 +240,22 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 fetch(`backend.php?page=logs&id=${userId}&modeUser=true`)
                     .then((response) => response.json())
                     .then((data) => {
-                        console.debug(data);
                         if (data.logs.length > 0) {
-                            const history = new HistoryResellers(data.logs);
+                            const history = new HistoryResellers(data.logs); // Assuming the HistoryResellers class is defined elsewhere
                             history.createGrid();
                         } else {
                             createNotification("No history");
                         }
                     });
             });
-        });         /**          * Crée une notification et l'ajoute à l'interface utilisateur.          * @param {string} text - Texte de la notification.          */
+        });
+
+        /**
+         * Crée une notification et l'ajoute à l'interface utilisateur.
+         * @param {string} text - Texte de la notification.
+         */
         function createNotification(text) {
-            var notificationsContainer = document.getElementById(
-                "notifications-container"
-            );
+            var notificationsContainer = document.getElementById("notifications-container");
             if (!notificationsContainer) {
                 notificationsContainer = document.createElement("div");
                 notificationsContainer.id = "notifications-container";
@@ -288,10 +280,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
             notification.style.transition = "opacity 0.4s ease";
             notification.style.marginBottom = "5px";
 
-            notificationsContainer.insertBefore(
-                notification,
-                notificationsContainer.firstChild
-            );
+            notificationsContainer.insertBefore(notification, notificationsContainer.firstChild);
 
             setTimeout(function () {
                 notification.style.opacity = "1";
@@ -351,7 +340,6 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
             document.location.pathname = "/";
         });
     </script>
-
 
 </body>
 
