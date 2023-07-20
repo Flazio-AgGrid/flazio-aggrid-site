@@ -94,6 +94,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   createLogoutButton();
 
+  helloRole(role);
+
   if (role === 3) createSettingsButton();
   // Récupérer les données à partir du backend
   fetch("backend.php?page=index")
@@ -755,4 +757,22 @@ function getCookie(cookieName) {
     }
   }
   return null; // Return null if the cookie with the given name is not found
+}
+
+function helloRole(role) {
+  const textRole = () => {
+    console.debug("Account role : ", role);
+    switch (role) {
+      case 1:
+        return "Read-only account";
+      case 2:
+        return "Read/write account";
+      case 3:
+        return "Admin account";
+      default:
+        return "Unknown role";
+    }
+  };
+
+  createNotification(textRole());
 }

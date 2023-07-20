@@ -139,12 +139,12 @@ function checkLogin($exclude = 0)
             }
         } else {
             // Les données du jeton sont invalides ou vides, déconnecter l'utilisateur
-            //logout(); // Si vous souhaitez déconnecter l'utilisateur en cas de jeton invalide
+            logout(); // Si vous souhaitez déconnecter l'utilisateur en cas de jeton invalide
             return false; // L'utilisateur n'est pas connecté ou autorisé
         }
     } else {
         // Le cookie d'authentification n'existe pas, déconnecter l'utilisateur
-        //logout(); // Si vous souhaitez déconnecter l'utilisateur en cas d'absence de cookie
+        logout(); // Si vous souhaitez déconnecter l'utilisateur en cas d'absence de cookie
         return false; // L'utilisateur n'est pas connecté ou autorisé
     }
 }
