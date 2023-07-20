@@ -65,12 +65,23 @@ function set_log($status, $initiator, $objectId, $arrayNewData)
     }
 }
 
+/**
+ * Ajoute une entrée dans le journal d'activité de l'utilisateur.
+ *
+ * @param string $status Le statut de l'action (par exemple : "login", "logout", etc.).
+ * @param int $initiator L'ID de l'utilisateur initiateur de l'action.
+ * @param string $column Le nom de la colonne associée à l'action (si applicable, sinon NULL).
+ * @param array $arrayNewData Les nouvelles données à enregistrer dans le journal.
+ * @return bool Renvoie true si l'entrée a été ajoutée avec succès, sinon false.
+ */
 function set_log_user($status, $initiator, $column, $arrayNewData)
 {
     try {
+        // Récupérer le journal d'activité de l'utilisateur
         $result = \db\get_log_by_user_id($initiator, $status, $column);
 
-        if ($result->num_rows >= 1 && $status !== 'login' || $status !== 'logout') {
+        // Vérifier s'il y a au moins une entrée dans le journal pour le statut spécifié
+        if ($result->num_rows >= 1 && ($status !== 'login' || $status !== 'logout')) {
             // Déplacer le pointeur du résultat à la dernière ligne
             $result->data_seek($result->num_rows - 1);
 
@@ -78,12 +89,13 @@ function set_log_user($status, $initiator, $column, $arrayNewData)
             $row = $result->fetch_assoc();
             $jsonOldData = $row['newData'];
         } else {
+            // Pas d'entrée existante ou le statut est "login" ou "logout", donc pas de données précédentes
             $jsonOldData = NULL;
         }
 
+        // Enregistrer l'entrée dans le journal avec les nouvelles données et les données précédentes
         \db\set_log($status, $initiator, null, $jsonOldData, json_encode($arrayNewData));
         return true;
-
     } catch (\Throwable $th) {
         return false;
     }
