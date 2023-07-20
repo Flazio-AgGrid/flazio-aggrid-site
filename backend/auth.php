@@ -2,6 +2,7 @@
 namespace auth;
 
 require_once 'db.php';
+require_once 'logs.php';
 
 /**
  * Récupère les informations de tous les utilisateurs depuis la base de données.
@@ -11,15 +12,15 @@ require_once 'db.php';
 function get_alluserinfo()
 {
     $alluserinfo = \db\get_alluserinfo();
-    $result      = array();
+    $result = array();
 
     if ($alluserinfo) {
 
         while ($row = $alluserinfo->fetch_assoc()) {
             // Convertir le statut en chaîne de caractères lisible
             $lastconnection = $row['lastconnection'];
-            $userId         = $row['id'];
-            $status         = "";
+            $userId = $row['id'];
+            $status = "";
             switch ($row['status']) {
                 case 0:
                     $status = 'connected';
@@ -42,8 +43,7 @@ function get_alluserinfo()
 
         // Retourner les données au format JSON
         return $result;
-    }
-    else {
+    } else {
         return false;
     }
 
@@ -62,64 +62,77 @@ function login($username, $password)
 
     if ($userinfo && $row = $userinfo->fetch_assoc()) {
         $hashedPasswordFromDB = $row['password'];
-        $userId               = $row['id'];
-
+        $userId = $row['id'];
+        $role = $row['role'];
+        $status = $row['status'];
         // Vérifier le mot de passe saisi avec le mot de passe haché de la base de données
-        if (password_verify($password, $hashedPasswordFromDB)) {
-            $token = generateAuthToken();
-            // Générer un jeton d'authentification unique
-            $authToken = array("id" => $userId, "token" => trim($token));
-            // Enregistrer le jeton d'authentification
-            if (saveAuthToken($userId, $token)) {
-                // Enregistrer le jeton d'authentification dans un cookie
-                setcookie('authToken', json_encode($authToken), time() + 3600, '/');
+        if ($status !== 3)
+            if (password_verify($password, $hashedPasswordFromDB)) {
+                $token = generateAuthToken();
+                // Générer un jeton d'authentification unique
+                $authToken = array("id" => $userId, "token" => $token, "role" => $role);
+                // Enregistrer le jeton d'authentification
+                if (saveAuthToken($userId, $token)) {
+                    \log\set_log_user('login', $userId, null, null);
+                    // Enregistrer le jeton d'authentification dans un cookie
+                    setcookie('authToken', json_encode($authToken), time() + 3600, '/');
 
-                modifiedStatus($userId, 0);
+                    modifiedStatus($userId, 0);
 
-                // Authentification réussie
-                $_SESSION['authenticated'] = true;
-                header('Location: ../index.php');
-                exit;
+                    // Authentification réussie
+                    $_SESSION['authenticated'] = true;
+                    header('Location: ../index.php');
+                    exit;
+                }
             }
-        }
     }
 
     // Le nom d'utilisateur ou le mot de passe est incorrect ou une erreur s'est produite
-    //header('Location: ./erreur.php');
+    header('Location: ./erreur.php');
     exit;
 }
 
 /**
- * Vérifie si l'utilisateur est connecté en vérifiant le cookie d'authentification.
+ * Vérifie si l'utilisateur est connecté et autorisé en fonction du rôle, en vérifiant le cookie d'authentification.
  *
- * @return bool Renvoie true si l'utilisateur est connecté, sinon false.
+ * @param int|array $exclude Un seul rôle ou un tableau de rôles à exclure de la connexion. Par défaut, aucun rôle n'est exclu (valeur 0).
+ * @return bool Renvoie true si l'utilisateur est connecté et autorisé, sinon false.
  */
-function checkLogin()
+function checkLogin($exclude = 0)
 {
     // Vérifier si le cookie d'authentification existe
     if (isset($_COOKIE['authToken'])) {
-        // \db\checkOnline();
+        // Vérifier si l'utilisateur est en ligne
+        \db\checkOnline();
+
         // Décoder le cookie d'authentification pour obtenir les données du jeton
         $authTokenCookie = json_decode($_COOKIE['authToken'], true);
 
+        // Récupérer le rôle de l'utilisateur à partir des données du jeton
+        $roleUser = array($authTokenCookie['role']);
+
         // Vérifier si les données du jeton sont valides et non vides
-        if (
-            validateAuthToken($authTokenCookie['id'], $authTokenCookie['token'])
-        ) {
-            // Utiliser les données du jeton pour vérifier si le jeton est valide dans la base de données
-            \db\keepAlive($authTokenCookie['id']);
-            return true;
+        if (validateAuthToken($authTokenCookie['id'], $authTokenCookie['token'])) {
+            // Si $exclude n'est pas un tableau, le convertir en tableau avec un seul élément
+            if (!is_array($exclude)) {
+                $exclude = array($exclude);
+            }
+            $count = count(array_intersect($exclude, $roleUser));
+            // Vérifier si le rôle de l'utilisateur est autorisé en fonction de $exclude
+            if (count(array_intersect($exclude, $roleUser)) === 0) {
+                // Actualiser le jeton d'authentification dans la base de données
+                \db\keepAlive($authTokenCookie['id']);
+                return true; // L'utilisateur est connecté et autorisé
+            }
+        } else {
+            // Les données du jeton sont invalides ou vides, déconnecter l'utilisateur
+            //logout(); // Si vous souhaitez déconnecter l'utilisateur en cas de jeton invalide
+            return false; // L'utilisateur n'est pas connecté ou autorisé
         }
-        else {
-            // Si les données du jeton sont invalides ou vides, déconnecter l'utilisateur
-            logout();
-            return false;
-        }
-    }
-    else {
-        // Le cookie d'authentification n'existe pas, l'utilisateur doit se connecter
-        logout();
-        return false;
+    } else {
+        // Le cookie d'authentification n'existe pas, déconnecter l'utilisateur
+        //logout(); // Si vous souhaitez déconnecter l'utilisateur en cas d'absence de cookie
+        return false; // L'utilisateur n'est pas connecté ou autorisé
     }
 }
 
@@ -132,6 +145,7 @@ function logout()
         // Supprimer le jeton d'authentification de votre système
         $authToken = json_decode($_COOKIE['authToken'], true);
         removeAuthToken($authToken['id']);
+        \log\set_log_user('logout', $authToken['id'], null, null);
     }
     // Supprimer le cookie d'authentification
     setcookie('authToken', '', time() - 3600, '/');
@@ -140,6 +154,7 @@ function logout()
         // Détruire la session en cours
         session_destroy();
     }
+
 
 
     // Réinitialiser les données de session
@@ -169,8 +184,7 @@ function saveAuthToken($userId, $authToken)
 {
     if (\db\saveAuthToken($userId, $authToken)) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -200,17 +214,21 @@ function removeAuthToken($userId)
 
 function modifiedStatus($userId, $idStatus)
 {
+    \log\set_log_user('modifiedStatus', $userId, 'status', array("idStatus" => $idStatus));
     return \db\modifiedStatus($userId, $idStatus);
 }
 
-function modifiedUsername($userId, $idStatus)
+function modifiedUsername($userId, $username)
 {
-    return \db\modifiedUsername($userId, $idStatus);
+    \log\set_log_user('modifiedUsername', $userId, 'initiator', array("idStatus" => $username));
+    return \db\modifiedUsername($userId, $username);
 }
 
 function modifiedPassword($userId, $password)
 {
-    return \db\modifiedPassword($userId, $password);
+    \log\set_log_user('modifiedPassword', $userId, NULL, NULL);
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    return \db\modifiedPassword($userId, $hashedPassword);
 }
 
 function modifiedRole($userId, $role)
@@ -231,6 +249,27 @@ function deleteUser($userId)
 {
     return \db\deleteUser($userId);
 
+}
+
+function editAccount($userId, $username, $password, $role)
+{
+    if ($userId) {
+        $result = array();
+        if ($username) {
+            array_push($result, array("message" => "Username", "status" => modifiedUsername($userId, $username)));
+        }
+        if ($password) {
+            array_push($result, array("message" => "Password", "status" => modifiedPassword($userId, $password)));
+            ;
+        }
+        if ($role) {
+            array_push($result, array("message" => "Role", "status" => modifiedRole($userId, $role)));
+            ;
+        }
+        return json_encode($result);
+    } else {
+        return json_encode(array("status" => false, "message" => "Need UserID"));
+    }
 }
 
 ?>

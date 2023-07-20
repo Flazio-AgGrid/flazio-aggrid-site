@@ -11,7 +11,7 @@ require_once 'db.php';
  */
 function get_log_by_id($id, $modeUser)
 {
-    $result_data = $modeUser ? \db\get_log_by_user_id($id) : \db\get_log_by_reseller_id($id);
+    $result_data = $modeUser ? \db\get_log_by_user_id($id, NULL, NULL) : \db\get_log_by_reseller_id($id);
     $data = array();
 
     while ($row = $result_data->fetch_assoc()) {
@@ -37,7 +37,7 @@ function get_log_by_id($id, $modeUser)
  *
  * @param string $status Le statut du journal.
  * @param int $initiator L'initiateur de l'action.
- * @param int $objectId L'ID de l'objet concerné par le journal.
+ * @param int $objectId  L'ID de l'objet concerné par le journal.
  * @param array $arrayNewData Les nouvelles données à enregistrer.
  * @return bool Renvoie true si l'enregistrement a été effectué avec succès, sinon false.
  */
@@ -58,6 +58,30 @@ function set_log($status, $initiator, $objectId, $arrayNewData)
         }
 
         \db\set_log($status, $initiator, $objectId, $jsonOldData, json_encode($arrayNewData));
+        return true;
+
+    } catch (\Throwable $th) {
+        return false;
+    }
+}
+
+function set_log_user($status, $initiator, $column, $arrayNewData)
+{
+    try {
+        $result = \db\get_log_by_user_id($initiator, $status, $column);
+
+        if ($result->num_rows > 0 && $status === "updated") {
+            // Déplacer le pointeur du résultat à la dernière ligne
+            $result->data_seek($result->num_rows - 1);
+
+            // Récupérer la dernière ligne
+            $row = $result->fetch_assoc();
+            $jsonOldData = $row['newData'];
+        } else {
+            $jsonOldData = NULL;
+        }
+
+        \db\set_log($status, $initiator, null, $jsonOldData, json_encode($arrayNewData));
         return true;
 
     } catch (\Throwable $th) {

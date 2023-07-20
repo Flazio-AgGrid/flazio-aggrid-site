@@ -80,6 +80,7 @@ const gridOptions = {
 var category = {};
 var list_modified_row = [];
 var statusCat = [];
+const role = JSON.parse(getCookie("authToken")).role;
 
 /**
  * Fonction exécutée lorsque le DOM est chargé.
@@ -92,7 +93,8 @@ document.addEventListener("DOMContentLoaded", function () {
   new agGrid.Grid(gridDiv, gridOptions);
 
   createLogoutButton();
-  createSettingsButton();
+
+  if (role === 3) createSettingsButton();
   // Récupérer les données à partir du backend
   fetch("backend.php?page=index")
     .then((response) => response.json())
@@ -152,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
         list_modified_row.length >= 1 &&
         !document.getElementById("bouttonSave")
       ) {
-        createSaveButton();
+        if (role === 2 || role === 3) createSaveButton();
       } else if (
         list_modified_row.length <= 0 &&
         document.getElementById("bouttonSave")
@@ -482,26 +484,27 @@ async function saveChangesToBackend() {
  * @param {Object} data - Les données modifiées à envoyer.
  */
 async function saveChangesToBackendAuto(data) {
-  fetch("backend.php?page=management", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ modifiedData: data }),
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      console.debug(result); // Affiche la réponse du backend
-      result.messages.map((el) => createNotification(el.message));
-      //majDataFront("management");
+  if (role === 2 || role === 3)
+    fetch("backend.php?page=management", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ modifiedData: data }),
     })
-    .catch((error) => {
-      console.error("Erreur lors de l'envoi des données au backend:", error);
-      createNotification(
-        `Erreur lors de l'envoi des données au backend: ${error}`
-      );
-      document.location.pathname = "/auth/login.php";
-    });
+      .then((response) => response.json())
+      .then((result) => {
+        console.debug(result); // Affiche la réponse du backend
+        result.messages.map((el) => createNotification(el.message));
+        //majDataFront("management");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'envoi des données au backend:", error);
+        createNotification(
+          `Erreur lors de l'envoi des données au backend: ${error}`
+        );
+        document.location.pathname = "/auth/login.php";
+      });
 }
 
 /**
@@ -735,4 +738,21 @@ function removeButton(id) {
   } else {
     return false;
   }
+}
+
+function getCookie(cookieName) {
+  const name = cookieName + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(";");
+
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === " ") {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(name) === 0) {
+      return cookie.substring(name.length, cookie.length);
+    }
+  }
+  return null; // Return null if the cookie with the given name is not found
 }

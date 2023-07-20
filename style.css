@@ -108,7 +108,8 @@ td {
 }
 
 #button_box_user {
-    width: 5%;
+    min-width: 5%;
+    width: auto;
     height: 50%;
     margin-top: 2vh;
     color: #000000b9;

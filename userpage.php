@@ -20,9 +20,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Flazio</title>
     <link rel="stylesheet" href="style.css">
-    <!-- <link rel="stylesheet"
+    <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-    <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js"></script>
 
     <!-- Prevent caching of the page -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -173,15 +173,15 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         <div class="box_user_management">
             <h1 class="title_box">Add User</h1>
             <div class="box_user_management_content">
-                <form method="POST" action="backend.php?page=userpage&option=password">
+                <form method="POST" action="userpage.php">
                     <input placeholder="Username" class="input" name="username" type="text" autocomplete="username"
                         required>
                     <!-- Future feature: Role selection -->
-                    <!-- <select placeholder="Role" class="input" id="role" name="role" required>
-                        <option value="0">Read-Only</option>  
-                        <option value="1">Read-Write</option>  
-                        <option value="2">Admin</option> 
-                    </select> -->
+                    <select placeholder="Role" class="input" name="role" required>
+                        <option value="0">Read-Only</option>
+                        <option value="1">Read-Write</option>
+                        <option value="2">Admin</option>
+                    </select>
                     <input placeholder="Password" class="input" name="password" type="password"
                         autocomplete="current-password" required>
                     <input class="button_white" type="submit" name="button_submit" value="Register">
@@ -211,7 +211,8 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 <br>
 
                 <!-- Editing user data -->
-                <form method="POST" action="backend.php?page=userpage&option=password">
+                <form class="editForm">
+                    <input type="hidden" name="userId" value="<?php echo $row["userId"] ?>">
                     <span class='modal_span'>
                         <i>Username: <?php echo $row["username"] ?></i>
                         <input placeholder='Username' class='input' name='username' type='text'>
@@ -219,11 +220,17 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     <br>
 
                     <!-- Future feature: Role selection -->
-                    <!-- <span class='modal_span'>
-                    <i>Role: <?php echo $row["username"] ?></i>
-                    <input placeholder='Role' class='input' id='role' name='role' type='text'>
-                </span>
-                <br> "; -->
+                    <span class='modal_span'>
+                        <i>Role: <?php echo $row["username"] ?></i>
+                        <!-- 1 = read ; 2 = read/write ; 3 = admin -->
+                        <select>
+                            <option value="1">Read</option>
+                            <option value="2">Read/Write</option>
+                            <option value="3">Admin</option>
+                        </select>
+                        <input placeholder='Role' class='input' name='role' type='text'>
+                    </span>
+                    <br> ";
 
                     <span class='modal_span'>
                         <i>New Password: </i>
@@ -232,7 +239,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     <br>
 
                     <div class='submit_udapte_user'>
-                        <input class='button_white' type='submit' name='button_submit' value='Register'>
+                        <input class='button_white' type='submit' name='button_submit' value='Save'>
                     </div>
                 </form>
 
@@ -252,11 +259,14 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         // DELETE USER 
         deleteButtons.forEach(button => {
             button.addEventListener('click', function (event) {
-                event.preventDefault(); // Pour éviter de suivre le lien
-
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
-                fetch('backend.php?page=deleteUser&userId=' + userId);
-                location.reload();
+                fetch('backend.php?page=deleteUser&userId=' + userId)
+                    .then((response) => response.json())
+                    .then((res) => {
+                        console.log(res)
+                        createNotification(`Delete user ${res ? "success" : "failed"}`)
+                    });;
+                setTimeout(() => { location.reload(); }, 250)
             });
         });
 
@@ -264,22 +274,26 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         statusButtons.forEach(button => {
 
             button.addEventListener('click', function (event) {
-                //event.preventDefault();
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 const idStatus = button.getAttribute('data-idStatus');
 
                 function setStatus(status) {
                     button.setAttribute('data-idStatus', status);
+
+                    const formData = new FormData();
+                    formData.append('userId', userId);
+                    formData.append('idStatus', status);
+
                     fetch('backend.php?page=userpage&option=status', {
                         method: 'POST',
-                        body: JSON.stringify({
-                            modifiedData: {
-                                userId: userId,
-                                idStatus: status
-                            }
-                        })
-                    });
-                    location.reload();
+                        body: formData
+                    })
+                        .then((response) => response.json())
+                        .then((res) => {
+                            console.log(res)
+                            createNotification(`Update status ${res ? "success" : "failed"}`)
+                        });
+                    setTimeout(() => { location.reload(); }, 250)
                 }
 
                 switch (parseInt(idStatus)) {
@@ -308,6 +322,58 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     });
             });
         });
+
+        // UPDATE USERS DATA 
+        editButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                openModal(event.target.getAttribute('data-id'));
+            });
+        });
+
+        // Fonction pour ouvrir la fenêtre modale
+        function openModal(userId) {
+            var modal = document.getElementById(userId);
+            modal.style.display = 'block';
+        }
+
+        // Fonction pour fermer la fenêtre modale
+        function closeModal(userId) {
+            var modal = document.getElementById(userId);
+            modal.style.display = 'none';
+        }
+
+        close.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                closeModal(event.target.parentNode.parentNode.id)
+            })
+        })
+
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target; // Get the form that was submitted
+            const formData = new FormData(form); // Collect form data
+
+            // Make a POST request to the backend endpoint
+            fetch('backend.php?page=userpage&option=editAccount', {
+                method: 'POST',
+                body: formData
+            }).then((response) => response.json())
+                .then((res) => {
+                    res.map((el) => {
+                        createNotification(`${el.message} ${el.status ? "successfully" : "failed"} modified`)
+                    })
+                }).catch((err) => {
+                    console.error(err)
+                })
+            setTimeout(() => { location.reload(); }, 750)
+        }
+        const forms = document.querySelectorAll('.editForm');
+        forms.forEach((form) => {
+            form.addEventListener('submit', handleSubmit);
+        })
+        // CREATE NOTIFICATION
 
         /**
          * Crée une notification et l'ajoute à l'interface utilisateur.
@@ -352,37 +418,6 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 }, 300);
             }, 3000);
         }
-
-
-        // UPDATE USERS DATA 
-        editButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                openModal(event.target.getAttribute('data-id'));
-            });
-        });
-
-
-
-        // Fonction pour ouvrir la fenêtre modale
-        function openModal(userId) {
-            var modal = document.getElementById(userId);
-            modal.style.display = 'block';
-        }
-
-        // Fonction pour fermer la fenêtre modale
-        function closeModal(userId) {
-            var modal = document.getElementById(userId);
-            modal.style.display = 'none';
-        }
-
-        close.forEach((button) => {
-            button.addEventListener('click', (event) => {
-                closeModal(event.target.parentNode.parentNode.id)
-            })
-        })
-
-
     </script>
 
     <script>

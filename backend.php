@@ -23,8 +23,11 @@ switch ($page) {
             if (auth\checkLogin())
                 echo grid\get_reseller_category();
         } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (auth\checkLogin())
+            if (auth\checkLogin(1))
                 echo grid\update_reseller_category();
+            else
+                echo false;
+
         }
         break;
 
@@ -33,8 +36,10 @@ switch ($page) {
             if (auth\checkLogin())
                 echo grid\get_manually_reseller_category();
         } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (auth\checkLogin())
+            if (auth\checkLogin(1))
                 echo grid\update_manually_reseller_category();
+            else
+                echo false;
         }
         break;
 
@@ -44,46 +49,26 @@ switch ($page) {
             echo auth\checkLogin();
         } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
             //fetch(backend.php?page=userpage&option=password)
-            if (auth\checkLogin()) {
+            if (auth\checkLogin(array(1, 2))) {
                 $option = $_GET['option'] ?? '';
                 switch ($option) {
-                    case 'username':
-                        $jsonData = file_get_contents('php://input');
-                        $modifiedData = json_decode($jsonData, true);
-                        $row = $modifiedData['modifiedData'];
-                        $userId = $row["id"];
-                        $username = $row['username'];
-                        echo auth\modifiedUsername($userId, $username);
-                        break;
-                    case 'password':
-                        $jsonData = file_get_contents('php://input');
-                        $modifiedData = json_decode($jsonData, true);
-                        $row = $modifiedData['modifiedData'];
-                        $userId = $row["id"];
-                        $password = $row['password'];
-                        echo auth\modifiedPassword($userId, $password);
-                        break;
-                    case 'role':
-                        $jsonData = file_get_contents('php://input');
-                        $modifiedData = json_decode($jsonData, true);
-                        $row = $modifiedData['modifiedData'];
-                        $userId = $row["id"];
-                        $role = $row['role'];
-                        echo auth\modifiedRole($userId, $role);
+                    case 'editAccount':
+                        $userId = $_POST["userId"] ?? "";
+                        $username = $_POST["username"] ?? "";
+                        $password = $_POST['password'] ?? "";
+                        $role = $_POST['role'] ?? "";
+                        echo auth\editAccount($userId, $username, $password, $role);
                         break;
                     case 'status':
-                        // Récupérer les données modifiées depuis la requête POST
-                        $jsonData = file_get_contents('php://input');
-                        $modifiedData = json_decode($jsonData, true);
-                        $row = $modifiedData['modifiedData'];
-                        $userId = $row["userId"];
-                        $statusId = $row['idStatus'];
+                        $userId = $_POST["userId"];
+                        $statusId = $_POST['idStatus'];
                         echo auth\modifiedStatus($userId, $statusId);
                         break;
                     default:
                         break;
                 }
-            }
+            } else
+                echo false;
         }
         break;
 
@@ -96,23 +81,18 @@ switch ($page) {
         break;
     case 'logs':
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
-            if (auth\checkLogin()) {
+            if (auth\checkLogin(array(1, 2))) {
                 echo log\get_log_by_id($_GET['id'], $_GET['modeUser']);
-            }
+            } else
+                echo false;
         }
         break;
     case 'deleteUser':
         if ($_SERVER["REQUEST_METHOD"] == "GET") {
-            if (auth\checkLogin()) {
+            if (auth\checkLogin(array(1, 2))) {
                 echo auth\deleteUser($_GET['userId']);
-            }
-        }
-        break;
-    case 'updateStatus':
-        if ($_SERVER["REQUEST_METHOD"] == "GET") {
-            if (auth\checkLogin()) {
-                echo auth\modifiedStatus($_GET['userId'], $_GET['idStatus']);
-            }
+            } else
+                echo false;
         }
         break;
     default:

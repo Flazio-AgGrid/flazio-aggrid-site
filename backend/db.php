@@ -118,7 +118,7 @@ function get_adress_reseller($id)
     $query = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
 
     try {
-        $result          = $mysqli->query($query);
+        $result = $mysqli->query($query);
         $tableau_adresse = $result->fetch_all();
         return $tableau_adresse;
     } catch (\Throwable $th) {
@@ -140,18 +140,18 @@ function set_fake_maps_info($tableau)
 
     try {
         foreach ($tableau as $row) {
-            $fk_lead           = $row[0];
-            $jsondata          = json_encode(
+            $fk_lead = $row[0];
+            $jsondata = json_encode(
                 array(
-                    "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
+                    "formatted_address" => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
                     "formatted_phone_number" => "123 xxx 6789",
-                    "name"                   => "Example",
-                    "website"                => "http://www.example.it/"
+                    "name" => "Example",
+                    "website" => "http://www.example.it/"
                 )
             );
-            $website           = "example.it";
-            $warning           = rand(0, 1);
-            $id_cat            = null;
+            $website = "example.it";
+            $warning = rand(0, 1);
+            $id_cat = null;
             $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
 
             $stmt = $mysqli->prepare($query);
@@ -175,12 +175,11 @@ function get_username($username)
 {
     global $mysqli;
 
-    $query = "SELECT * FROM users WHERE username = ?";
+    $query = "SELECT username, password, id, role FROM users WHERE username = ?";
 
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL
-        $query = "SELECT username, password, id FROM users WHERE username = ?";
-        $stmt  = $mysqli->prepare($query);
+        $stmt = $mysqli->prepare($query);
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -197,7 +196,7 @@ function get_username($username)
  *
  * @param string $username Le nom d'utilisateur à insérer.
  * @param string $hashedPassword Le mot de passe haché à insérer.
- * @return bool Retourne `true` si l'insertion a réussi, sinon `false`.
+ * @return bool Retourne true si l'insertion a réussi, sinon false.
  */
 function set_register($username, $hashedPassword)
 {
@@ -319,7 +318,7 @@ function validateAuthToken($userid, $token)
         $result = $stmt->get_result();
 
         if ($result->num_rows === 1) {
-            $row     = $result->fetch_assoc();
+            $row = $result->fetch_assoc();
             $dbToken = $row['token'];
             return $dbToken === $token;
         } else {
@@ -353,7 +352,7 @@ function keepAlive($userId)
 {
     global $mysqli;
 
-    $updateSql      = "UPDATE users SET lastconnection = ? WHERE id = ?";
+    $updateSql = "UPDATE users SET lastconnection = ? WHERE id = ?";
     $lastconnection = date('Y-m-d H:i:s');
     try {
         $stmt = $mysqli->prepare($updateSql);
@@ -482,15 +481,23 @@ function get_log_by_reseller_id($id)
     }
 }
 
-function get_log_by_user_id($id)
+function get_log_by_user_id($id, $status, $column)
 {
     global $mysqli;
 
-    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime, oldData, newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE u.id = ?";
-
+    $getLogSql = "SELECT id, initiator as  username, objectToLog, status, dateTime, oldData, newData FROM log WHERE initiator = ?";
+    if ($column) {
+        $getLogSql .= ' AND ' . $column . ' = ?';
+    }
     try {
         $stmt = $mysqli->prepare($getLogSql);
-        $stmt->bind_param("i", $id);
+
+        if ($column) {
+            $stmt->bind_param("is", $id, $status);
+        } else {
+            $stmt->bind_param("i", $id);
+        }
+
         $stmt->execute();
         $result = $stmt->get_result();
         return $result;
@@ -501,15 +508,7 @@ function get_log_by_user_id($id)
 }
 
 
-/**
- * Insère un enregistrement dans la table "log" avec les informations fournies.
- *
- * @param string $status - Le statut de l'enregistrement.
- * @param int $initiator - L'initiateur de l'action.
- * @param int $objectToLog - L'objet à enregistrer.
- * @param string $newData - Les nouvelles données au format JSON.
- * @return bool - Retourne true si l'insertion est réussie, sinon false en cas d'erreur.
- */
+
 function set_log($status, $initiator, $objectToLog, $oldData, $newData)
 {
     global $mysqli;
@@ -552,32 +551,3 @@ function deleteUser($userId)
         return false; // La suppression a échoué en raison d'une erreur
     }
 }
-
-// function update_statusId($userId, $statusId)
-// {
-//     global $mysqli;
-
-//     $updateSql = "UPDATE users
-//     SET status = $statusId
-//         CASE 
-//             WHEN status IN (0, 1, 2) THEN 3
-//             WHEN status = 3 THEN 2
-//             ELSE status
-//         END
-//     WHERE id = userId; ";
-
-//     try {
-//         // Préparer la requête
-//         $stmt = $mysqli->prepare($updateSql);
-
-//         // Lier le paramètre de l'ID de l'utilisateur
-//         $stmt->bind_param("i", $userId);
-//         $stmt->execute();
-//         $stmt->close();
-//         return true;
-
-//     } catch (\Throwable $th) {
-//         echo "Une erreur s'est produite : " . $th->getMessage();
-//         return false; // La suppression a échoué en raison d'une erreur
-//     }
-// }
