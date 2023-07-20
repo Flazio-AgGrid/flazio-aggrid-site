@@ -20,8 +20,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Flazio</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise@30.0.2/dist/ag-grid-enterprise.min.js"></script>
 
     <!-- Prevent caching of the page -->
@@ -31,10 +30,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 </head>
 
 <body>
-    <?php
-    // Display the current date and time
-    echo date('Y-m-d H:i:s');
-    ?>
+
 
     <div id="page">
         <!-- User Management Section -->
@@ -54,10 +50,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                 // Call the function to get user information
                 $result = \auth\get_alluserinfo();
-
                 if ($result) {
                     // Display the user information in a table
-                    ?>
+                ?>
                     <table>
                         <tr>
                             <th>
@@ -65,6 +60,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                             </th>
                             <th>
                                 <h2>Last Connection</h2>
+                            </th>
+                            <th>
+                                <h2>Role</h2>
                             </th>
                             <th>
                                 <h2>ID</h2>
@@ -79,7 +77,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                             $color_status = ""; // Background color
                             $color = ""; // Dot color
                             $font_color = ""; // Font color
-                    
+
                             if ($row['status']['idStatus'] == 3) {
                                 $color_status = "#00000035";
                                 $font_color = "#00000045";
@@ -121,10 +119,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                             } else {
                                 $timePassed .= "<1 min";
                             }
-                            ?>
+                        ?>
                             <!-- // Display each user's information row in the table -->
-                            <tr class='tr_status'
-                                style='background-color:<?php echo $color_status ?>; color:<?php echo $font_color ?>'>
+                            <tr class='tr_status' style='background-color:<?php echo $color_status ?>; color:<?php echo $font_color ?>'>
                                 <td>
                                     <?php echo $row["username"] ?>
                                     <span class='dot' style='background-color: <?php echo $color; ?>'>
@@ -134,6 +131,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                                     <?php echo $timePassed ?>
                                 </td>
                                 <td>
+                                    <?php echo $row['role']['titleRole'] ?>
+                                </td>
+                                <td>
                                     <?php echo $row["userId"] ?>
                                 </td>
                                 <td>
@@ -141,14 +141,10 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                                         <div class='ellipsis'>&#8942;</div>
                                         <div class='dropdown-content'>
                                             <!-- Options for each user -->
-                                            <a class='dropdown_one status_button' href='#'
-                                                data-id='<?php echo $row["userId"] ?>'
-                                                data-idStatus='<?php echo $row['status']['idStatus'] ?>'>Enabled/Disabled</a>
+                                            <a class='dropdown_one status_button' href='#' data-id='<?php echo $row["userId"] ?>' data-idStatus='<?php echo $row['status']['idStatus'] ?>'>Enabled/Disabled</a>
                                             <a class='log_button' href='#' data-id='<?php echo $row["userId"] ?>'>Log</a>
                                             <a class='edit_button' href='#' data-id='<?php echo $row["userId"] ?>'>Edit</a>
-                                            <a class='dropdown_three delete_button' href='#'
-                                                data-id='<?php echo $row["userId"] ?>'
-                                                data-idStatus=' <?php echo $row['status']['idStatus'] ?>'>
+                                            <a class='dropdown_three delete_button' href='#' data-id='<?php echo $row["userId"] ?>' data-idStatus=' <?php echo $row['status']['idStatus'] ?>'>
                                                 <span class='text_delete'>Delete</span>
                                             </a>
                                         </div>
@@ -157,7 +153,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                             </tr>
                         <?php } ?>
                     </table>
-                    <?php
+                <?php
                 } else {
                     echo "<span class='no_data_error'>Aucun utilisateur trouvé dans la base de données.</span>";
                 }
@@ -174,16 +170,14 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
             <h1 class="title_box">Add User</h1>
             <div class="box_user_management_content">
                 <form method="POST" action="userpage.php">
-                    <input placeholder="Username" class="input" name="username" type="text" autocomplete="username"
-                        required>
+                    <input placeholder="Username" class="input" name="username" type="text" autocomplete="username" required>
                     <!-- Future feature: Role selection -->
                     <select placeholder="Role" class="input" name="role" required>
                         <option value="0">Read-Only</option>
                         <option value="1">Read-Write</option>
                         <option value="2">Admin</option>
                     </select>
-                    <input placeholder="Password" class="input" name="password" type="password"
-                        autocomplete="current-password" required>
+                    <input placeholder="Password" class="input" name="password" type="password" autocomplete="current-password" required>
                     <input class="button_white" type="submit" name="button_submit" value="Register">
                 </form>
                 <input id="homeButton" class="button_white" type="button" name="homeButton" value="Return to home">
@@ -221,16 +215,15 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
                     <!-- Future feature: Role selection -->
                     <span class='modal_span'>
-                        <i>Role: <?php echo $row["username"] ?></i>
+                        <i>Role: <?php echo $row['role']['titleRole'] ?></i>
                         <!-- 1 = read ; 2 = read/write ; 3 = admin -->
-                        <select>
-                            <option value="1">Read</option>
+                        <select placeholder="Role" class="input role" name="role" required="">
+                            <option value="1">Read-Only</option>
                             <option value="2">Read/Write</option>
                             <option value="3">Admin</option>
                         </select>
-                        <input placeholder='Role' class='input' name='role' type='text'>
                     </span>
-                    <br> ";
+                    <br>
 
                     <span class='modal_span'>
                         <i>New Password: </i>
@@ -258,7 +251,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
         // DELETE USER 
         deleteButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 fetch('backend.php?page=deleteUser&userId=' + userId)
                     .then((response) => response.json())
@@ -266,14 +259,16 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                         console.log(res)
                         createNotification(`Delete user ${res ? "success" : "failed"}`)
                     });;
-                setTimeout(() => { location.reload(); }, 250)
+                setTimeout(() => {
+                    location.reload();
+                }, 250)
             });
         });
 
         // UPDATE USERS STATUS 
         statusButtons.forEach(button => {
 
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 const userId = button.getAttribute('data-id'); // Récupérer l'ID de l'utilisateur
                 const idStatus = button.getAttribute('data-idStatus');
 
@@ -285,15 +280,17 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     formData.append('idStatus', status);
 
                     fetch('backend.php?page=userpage&option=status', {
-                        method: 'POST',
-                        body: formData
-                    })
+                            method: 'POST',
+                            body: formData
+                        })
                         .then((response) => response.json())
                         .then((res) => {
                             console.log(res)
                             createNotification(`Update status ${res ? "success" : "failed"}`)
                         });
-                    setTimeout(() => { location.reload(); }, 250)
+                    setTimeout(() => {
+                        location.reload();
+                    }, 250)
                 }
 
                 switch (parseInt(idStatus)) {
@@ -309,7 +306,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
         logButtons.forEach(button => {
             const userId = button.getAttribute('data-id');
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 fetch(`backend.php?page=logs&id=${userId}&modeUser=true`)
                     .then((response) => response.json())
                     .then((data) => {
@@ -325,7 +322,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
         // UPDATE USERS DATA 
         editButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
                 event.preventDefault();
                 openModal(event.target.getAttribute('data-id'));
             });
@@ -350,16 +347,15 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
         })
 
         function handleSubmit(event) {
-            event.preventDefault();
 
             const form = event.target; // Get the form that was submitted
             const formData = new FormData(form); // Collect form data
 
             // Make a POST request to the backend endpoint
             fetch('backend.php?page=userpage&option=editAccount', {
-                method: 'POST',
-                body: formData
-            }).then((response) => response.json())
+                    method: 'POST',
+                    body: formData
+                }).then((response) => response.json())
                 .then((res) => {
                     res.map((el) => {
                         createNotification(`${el.message} ${el.status ? "successfully" : "failed"} modified`)
@@ -367,7 +363,9 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                 }).catch((err) => {
                     console.error(err)
                 })
-            setTimeout(() => { location.reload(); }, 750)
+            setTimeout(() => {
+                location.reload();
+            }, 750)
         }
         const forms = document.querySelectorAll('.editForm');
         forms.forEach((form) => {
@@ -407,13 +405,13 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
             notificationsContainer.insertBefore(notification, notificationsContainer.firstChild);
 
-            setTimeout(function () {
+            setTimeout(function() {
                 notification.style.opacity = "1";
             }, 100);
 
-            setTimeout(function () {
+            setTimeout(function() {
                 notification.style.opacity = "0";
-                setTimeout(function () {
+                setTimeout(function() {
                     notification.parentNode.removeChild(notification);
                 }, 300);
             }, 3000);
@@ -422,7 +420,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
 
     <script>
         const homeButton = document.getElementById("homeButton");
-        homeButton.addEventListener("click", function () {
+        homeButton.addEventListener("click", function() {
             document.location.pathname = "/";
         });
     </script>

@@ -337,6 +337,6 @@ a#button_submit {
     font-weight: bold;
 }
 
-select#role {
+select.role {
     width: 59%;
 }

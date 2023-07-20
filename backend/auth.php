@@ -1,4 +1,5 @@
 <?php
+
 namespace auth;
 
 require_once 'db.php';
@@ -21,6 +22,7 @@ function get_alluserinfo()
             $lastconnection = $row['lastconnection'];
             $userId = $row['id'];
             $status = "";
+            $role = "";
             switch ($row['status']) {
                 case 0:
                     $status = 'connected';
@@ -36,8 +38,20 @@ function get_alluserinfo()
                     break;
             }
 
+            switch ($row['role']) {
+                case 1:
+                    $role = 'Read';
+                    break;
+                case 2:
+                    $role = 'Read/Write';
+                    break;
+                case 3:
+                    $role = 'Admin';
+                    break;
+            }
+
             // Les variables $status et $lastconnection ne sont pas utilisées ici, donc elles peuvent être supprimées.
-            array_push($result, array("userId" => $userId, "username" => $row['username'], "status" => array("titleStatus" => $status, "idStatus" => $row['status']), "lastConnection" => $lastconnection));
+            array_push($result, array("userId" => $userId, "username" => $row['username'], "status" => array("titleStatus" => $status, "idStatus" => $row['status']), "role" => array("titleRole" => $role, "idRole" => $row['role']), "lastConnection" => $lastconnection));
         }
 
 
@@ -46,7 +60,6 @@ function get_alluserinfo()
     } else {
         return false;
     }
-
 }
 
 /**
@@ -248,7 +261,6 @@ function registerUser($username, $password)
 function deleteUser($userId)
 {
     return \db\deleteUser($userId);
-
 }
 
 function editAccount($userId, $username, $password, $role)
@@ -259,17 +271,13 @@ function editAccount($userId, $username, $password, $role)
             array_push($result, array("message" => "Username", "status" => modifiedUsername($userId, $username)));
         }
         if ($password) {
-            array_push($result, array("message" => "Password", "status" => modifiedPassword($userId, $password)));
-            ;
+            array_push($result, array("message" => "Password", "status" => modifiedPassword($userId, $password)));;
         }
         if ($role) {
-            array_push($result, array("message" => "Role", "status" => modifiedRole($userId, $role)));
-            ;
+            array_push($result, array("message" => "Role", "status" => modifiedRole($userId, $role)));;
         }
         return json_encode($result);
     } else {
         return json_encode(array("status" => false, "message" => "Need UserID"));
     }
 }
-
-?>

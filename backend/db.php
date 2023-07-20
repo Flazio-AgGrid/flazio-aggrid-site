@@ -286,7 +286,7 @@ function get_alluserinfo()
     global $mysqli;
 
     // Récupération des utilisateurs depuis la base de données
-    $query = "SELECT id, username, lastconnection, status FROM users ORDER BY username";
+    $query = "SELECT id, username, lastconnection, status, role FROM users ORDER BY username";
 
     try {
         $result = $mysqli->query($query);
