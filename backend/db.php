@@ -175,7 +175,7 @@ function get_username($username)
 {
     global $mysqli;
 
-    $query = "SELECT username, password, id, role FROM users WHERE username = ?";
+    $query = "SELECT username, password, id, role , status FROM users WHERE username = ?";
 
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL

@@ -70,7 +70,7 @@ function set_log_user($status, $initiator, $column, $arrayNewData)
     try {
         $result = \db\get_log_by_user_id($initiator, $status, $column);
 
-        if ($result->num_rows > 0 && $status === "updated") {
+        if ($result->num_rows >= 1 && $status !== 'login' || $status !== 'logout') {
             // Déplacer le pointeur du résultat à la dernière ligne
             $result->data_seek($result->num_rows - 1);
 
