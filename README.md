@@ -1,5 +1,14 @@
 # flazio-aggrid-site
-## Dévelopement
+## Useful information for users
+The default account is Admin, to connect use :
+- username : ```admin```
+- password : ```admin```
+  
+### 🚧CHANGE DEFAULT PASSWORD AFTER FIRST LOGIN🚧
+
+
+
+## 🚧 Dévelopement 🚧
 - Pour chaque nouvelle fonctionnalité, une **nouvelle *branch*** portant le nom de celle-ci devra être créer.
 - Une fois que votre fonctionnalité est fini de dev vous allez pouvoir **fusionner sur la branch dev**. (Pensez à *commit* avant de fusionner pour garder une trace de vos modifications)
 - A noté que toute créations de commit, branch, 
