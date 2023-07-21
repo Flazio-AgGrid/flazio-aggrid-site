@@ -78,6 +78,7 @@ function login($username, $password)
                     setcookie('authToken', json_encode($authToken), time() + 3600, '/');
 
                     modifiedStatus($userId, 0);
+                    \db\keepAlive($userId);
 
                     // Authentification réussie
                     $_SESSION['authenticated'] = true;
