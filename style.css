@@ -1,0 +1,342 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap'); */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #e6e6e6;
+    font-family: 'Montserrat', sans-serif;
+    color: #000000;
+    font-size: 1.5vw;
+
+}
+
+#page {
+    display: flex;
+
+}
+
+h1,
+h2,
+h3 {
+    margin: 0;
+    font-size: 1.5vw;
+    font-weight: bold;
+}
+
+h2 {
+    margin-bottom: 2vh;
+}
+
+.box_table_all_user {
+    width: 70vw;
+    margin: 5vh 3vh 5vh 5vh;
+    justify-content: center;
+    border-radius: 50px;
+    background: #e6e6e6;
+    box-shadow: 9px 9px 18px #c4c4c4,
+        -9px -9px 18px #ffffff;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    overflow: hidden;
+}
+
+.table_all_user {
+    display: flex;
+    height: 100%;
+}
+
+table {
+    width: 100%;
+    height: 100%;
+    margin: 2vh 4vh 3vh 4vh;
+    text-align: center;
+}
+
+.box_user_management {
+    height: fit-content;
+    width: 35vw;
+    margin: 5vh 5vh 5vh 3vh;
+    border-radius: 50px;
+    background: #e6e6e6;
+    box-shadow: 9px 9px 18px #c4c4c4,
+        -9px -9px 18px #ffffff;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.box_user_management_login {
+    height: 45vh;
+}
+
+
+
+#title_box {
+    margin: 4vh 3vh 2vh 3vh;
+    font-size: 30px;
+}
+
+.title_box {
+    font-size: 30px;
+    margin-top: 5vh;
+}
+
+td {
+    padding: 3vh 0vh 3vh 0vh;
+    border-bottom: 1px solid #00000050;
+    position: relative;
+}
+
+.dot {
+    height: 1vh;
+    width: 1vh;
+    /* background-color: #; */
+    border-radius: 50%;
+    border: #000000 solid 0.5px;
+    display: inline-block;
+    margin-top: 5px;
+    vertical-align: bottom;
+}
+
+.header_box_user {
+    display: flex;
+    justify-content: space-between;
+    margin-inline: 50px;
+    border-bottom: #000000 solid 1px;
+    align-items: baseline;
+}
+
+#button_box_user {
+    min-width: 5%;
+    width: auto;
+    height: 50%;
+    margin-top: 2vh;
+    color: #000000b9;
+}
+
+button#button_box_user {
+    display: flex;
+    justify-content: center;
+}
+
+/* ------------------------Form management user ------------------------------------- */
+
+.input {
+    margin-top: 40px;
+    background: none;
+    border: none;
+    outline: none;
+    width: 50%;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    box-shadow: inset 2px 5px 10px rgb(147, 147, 147);
+    color: #00000080;
+}
+
+/* ------------------------Form management user ------------------------------------- */
+
+/* ------------------------Botton management user ------------------------------------- */
+.button_white {
+    color: #090909;
+    padding: 2%;
+    width: 40%;
+    font-size: 18px;
+    border-radius: 0.5em;
+    background: #e8e8e8;
+    border: 1px solid #e8e8e8;
+    transition: all .3s;
+    box-shadow: 6px 6px 12px #c5c5c5,
+        -6px -6px 12px #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    margin: 3vh;
+    text-decoration: none;
+}
+
+.button_white:hover {
+    border: 1px solid white;
+    box-shadow: 6px 6px 12px #a2a2a2,
+        -6px -6px 12px #ffffff;
+}
+
+.button_white:active {
+    box-shadow: 4px 4px 12px #c5c5c5,
+        -4px -4px 12px #ffffff;
+}
+
+#button_submit {
+    width: 12vw;
+}
+
+
+/* ------------------------Botton management user ------------------------------------- */
+
+
+/* ------------------------ Modal ------------------------------------- */
+
+/* Style pour la fenêtre modale */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Fond sombre semi-transparent */
+}
+
+/* Style pour le contenu de la fenêtre modale */
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-height: 30vh;
+    height: auto;
+    min-width: 35vw;
+    width: auto;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 50px;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Style pour le bouton de fermeture (X) */
+.close {
+    position: absolute;
+    top: 7%;
+    right: 7%;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+span.material-symbols-outlined:active {
+    transform: rotate(90deg);
+}
+
+
+#title_box_modal {
+    margin-top: 0;
+    display: flex;
+}
+
+.modal_span {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.submit_udapte_user {
+    display: flex;
+    justify-content: center;
+}
+
+/* ------------------------ Modal ------------------------------------- */
+
+
+.ellipsis {
+    font-weight: bold;
+    font-size: 25px;
+    cursor: pointer;
+    padding-inline: 2vw;
+}
+
+.no_data_error {
+    text-align: center;
+    align-items: center;
+}
+
+#page_login {
+    display: flex;
+    justify-content: center;
+}
+
+#footer_contact {
+    color: #00000075;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+#a_footer_contact {
+    color: inherit !important;
+}
+
+#p_error_text {
+    font-size: 25px;
+    margin-block: 8vh;
+    margin-inline: 2vh;
+}
+
+a#button_submit {
+    font-size: 21PX;
+    padding-inline: 5vh;
+}
+
+/* Conteneur de la dropbox */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Contenu de la dropbox (caché par défaut) */
+.dropdown-content {
+    display: none;
+    position: fixed;
+    margin-inline: -4%;
+    background-color: #f9f9f9;
+    min-width: 2vh;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 10%;
+}
+
+/* Liens à l'intérieur de la dropbox */
+.dropdown-content a {
+    color: #000000;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 1.1vw;
+    border-bottom: #00000050 solid 1px;
+}
+
+.dropdown-content a:hover {
+    background-color: #dddddd;
+}
+
+.dropdown_one {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.dropdown_three {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+/* Changement de style au survol de la dropbox */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.space {
+    height: 2vh;
+}
+
+.text_delete {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+select.role {
+    width: 59%;
+}
