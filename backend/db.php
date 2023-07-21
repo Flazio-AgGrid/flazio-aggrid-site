@@ -1,7 +1,9 @@
 <?php
+
 namespace db;
 
 use mysqli;
+use mysqli_sql_exception;
 
 // Établir une connexion à MySQL et exécuter une requête
 $mysqli = new mysqli("localhost", "root", "", "reseller_experience");
@@ -25,8 +27,7 @@ function get_reseller()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -45,8 +46,7 @@ function get_category()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -76,8 +76,7 @@ function get_verify_fk_lead_exists($row, $id, $id_cat)
         $stmt->close();
 
         return $count;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -101,8 +100,7 @@ function update_fk_lead($id, $id_cat)
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -120,11 +118,10 @@ function get_adress_reseller($id)
     $query = "SELECT id, Indirizzo, Comune, CAP, Provincia FROM reseller_experience_customer WHERE id = $id";
 
     try {
-        $result          = $mysqli->query($query);
+        $result = $mysqli->query($query);
         $tableau_adresse = $result->fetch_all();
         return $tableau_adresse;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -143,18 +140,18 @@ function set_fake_maps_info($tableau)
 
     try {
         foreach ($tableau as $row) {
-            $fk_lead           = $row[0];
-            $jsondata          = json_encode(
+            $fk_lead = $row[0];
+            $jsondata = json_encode(
                 array(
-                    "formatted_address"      => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
+                    "formatted_address" => $row[1] . ", " . $row[3] . ", " . $row[2] . ", Italy",
                     "formatted_phone_number" => "123 xxx 6789",
-                    "name"                   => "Example",
-                    "website"                => "http://www.example.it/"
+                    "name" => "Example",
+                    "website" => "http://www.example.it/"
                 )
             );
-            $website           = "example.it";
-            $warning           = rand(0, 1);
-            $id_cat            = null;
+            $website = "example.it";
+            $warning = rand(0, 1);
+            $id_cat = null;
             $id_cat_automatica = $id_cat ? $id_cat : (rand(0, 10) ? null : null);
 
             $stmt = $mysqli->prepare($query);
@@ -163,8 +160,7 @@ function set_fake_maps_info($tableau)
         }
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -179,7 +175,7 @@ function get_username($username)
 {
     global $mysqli;
 
-    $query = "SELECT * FROM users WHERE username = ?";
+    $query = "SELECT username, password, id, role , status FROM users WHERE username = ?";
 
     try {
         // Utiliser une requête préparée pour éviter l'injection SQL
@@ -187,9 +183,8 @@ function get_username($username)
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
-        return $result;
-    }
-    catch (\Throwable $th) {
+        return $result->num_rows > 0 ? $result : false;
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -201,24 +196,34 @@ function get_username($username)
  *
  * @param string $username Le nom d'utilisateur à insérer.
  * @param string $hashedPassword Le mot de passe haché à insérer.
- * @return bool Retourne `true` si l'insertion a réussi, sinon `false`.
+ * @return bool Retourne true si l'insertion a réussi, sinon false.
  */
-function set_register($username, $hashedPassword)
+function set_register($username, $hashedPassword, $role)
 {
     global $mysqli;
 
-    $query = "INSERT INTO users (username, password) VALUES (?, ?)";
+    $query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
 
     try {
         $stmt = $mysqli->prepare($query);
-        $stmt->bind_param("ss", $username, $hashedPassword);
+        $stmt->bind_param(
+            "sss",
+            $username,
+            $hashedPassword,
+            $role
+        );
         $stmt->execute();
         $stmt->close();
         return true;
-    }
-    catch (\Throwable $th) {
-        echo "Une erreur s'est produite : " . $th->getMessage();
-        return false;
+    } catch (\Throwable $th) {
+
+        if ($th->getCode() === 1062) {
+            echo "Nom d'utilisateur déjà utilisé.";
+            return false;
+        } else {
+            echo "Une erreur s'est produite : " . $th->getMessage();
+            return false;
+        }
     }
 }
 
@@ -235,8 +240,7 @@ function get_reseller_set_manually()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -255,8 +259,7 @@ function get_status()
     try {
         $result_data = $mysqli->query($query);
         return $result_data;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -273,31 +276,188 @@ function update_status_lead($id, $lead_status)
         $stmt = $mysqli->prepare($updateSql);
         $stmt->bind_param("ii", $lead_status, $id);
         $stmt->execute();
+        $rowCount = $stmt->affected_rows;
         $stmt->close();
 
-        return true;
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
     }
-    catch (\Throwable $th) {
+}
+
+function get_alluserinfo()
+{
+    global $mysqli;
+
+    // Récupération des utilisateurs depuis la base de données
+    $query = "SELECT id, username, lastconnection, status, role FROM users ORDER BY username";
+
+    try {
+        $result = $mysqli->query($query);
+        return $result->num_rows > 0 ? $result : false;
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
 }
 
 /**
- * Récupère tous les logs de la base de données.
- * @return mixed|array|false Retourne un tableau contenant les logs si la requête est réussie, sinon retourne false.
+ * Vérifie si un jeton d'authentification est valide pour un utilisateur donné.
+ *
+ * @param int $userid ID de l'utilisateur.
+ * @param string $token Jeton d'authentification à vérifier.
+ * @return bool Renvoie true si le jeton est valide, sinon false.
  */
-function get_log_all()
+function validateAuthToken($userid, $token)
 {
     global $mysqli;
 
-    $getLogSql = "SELECT l.id, initiator, objectToLog, l.status FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id";
+    // Requête pour récupérer les utilisateurs depuis la base de données
+    $query = "SELECT token FROM users WHERE id = ?";
 
     try {
-        $result_data = $mysqli->query($getLogSql);
-        return $result_data;
+        $stmt = $mysqli->prepare($query);
+        $stmt->bind_param("i", $userid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+            $dbToken = $row['token'];
+            return $dbToken === $token;
+        } else {
+            return false;
+        }
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
     }
-    catch (\Throwable $th) {
+}
+
+function saveAuthToken($userId, $token)
+{
+    global $mysqli;
+    $updateSql = "UPDATE users SET token = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $token, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function keepAlive($userId)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET lastconnection = ? WHERE id = ?";
+    $lastconnection = date('Y-m-d H:i:s');
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $lastconnection, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function checkOnline()
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET STATUS = CASE WHEN TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 10 OR token IS NULL THEN 1 ELSE 0 END,
+    token = CASE WHEN STATUS = 1 AND TIMESTAMPDIFF(MINUTE, lastconnection, NOW()) > 30 THEN NULL ELSE token END;";
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->execute();
+        $stmt->close();
+        return true;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function modifiedStatus($userId, $idStatus)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET status = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("ss", $idStatus, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+function modifiedUsername($userId, $username)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET username  = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $username, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+function modifiedPassword($userId, $password)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET password  = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $password, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
+    }
+}
+
+function modifiedRole($userId, $role)
+{
+    global $mysqli;
+
+    $updateSql = "UPDATE users SET role  = ? WHERE id = ?";
+
+    try {
+        $stmt = $mysqli->prepare($updateSql);
+        $stmt->bind_param("si", $role, $userId);
+        $stmt->execute();
+        $rowCount = $stmt->affected_rows;
+        $stmt->close();
+        return $rowCount === 1 ? true : false;
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
@@ -308,11 +468,11 @@ function get_log_all()
  * @param int $id L'ID du log à récupérer.
  * @return mixed|array|false Retourne un tableau contenant le log si la requête est réussie, sinon retourne false.
  */
-function get_log_by_id($id)
+function get_log_by_reseller_id($id)
 {
     global $mysqli;
 
-    $getLogSql = "SELECT l.id, initiator, objectToLog, l.status FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
+    $getLogSql = "SELECT l.id, username, objectToLog, l.status, dateTime, oldData, newData FROM log l INNER JOIN users u ON l.initiator = u.id INNER JOIN reseller_experience_customer r ON l.objectToLog = r.id WHERE r.id = ?";
 
     try {
         $stmt = $mysqli->prepare($getLogSql);
@@ -320,40 +480,79 @@ function get_log_by_id($id)
         $stmt->execute();
         $result = $stmt->get_result();
         return $result;
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false;
     }
-    catch (\Throwable $th) {
+}
+
+function get_log_by_user_id($id, $status, $column)
+{
+    global $mysqli;
+
+    $getLogSql = "SELECT id, initiator as  username, objectToLog, status, dateTime, oldData, newData FROM log WHERE initiator = ?";
+    if ($column) {
+        $getLogSql .= ' AND ' . $column . ' = ?';
+    }
+    try {
+        $stmt = $mysqli->prepare($getLogSql);
+
+        if ($column) {
+            $stmt->bind_param("is", $id, $status);
+        } else {
+            $stmt->bind_param("i", $id);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result;
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
     }
 }
 
 
-/**
- * Insère un enregistrement dans la table "log" avec les informations fournies.
- *
- * @param string $status - Le statut de l'enregistrement.
- * @param int $initiator - L'initiateur de l'action.
- * @param int $objectToLog - L'objet à enregistrer.
- * @param string $newData - Les nouvelles données au format JSON.
- * @return bool - Retourne true si l'insertion est réussie, sinon false en cas d'erreur.
- */
-function set_log($status, $initiator, $objectToLog, $newData)
+
+function set_log($status, $initiator, $objectToLog, $oldData, $newData)
 {
     global $mysqli;
 
-    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime, newData) VALUES (?, ?, ?, NOW(), ?)";
+    $updateSql = "INSERT INTO log (status, objectToLog, initiator, dateTime, oldData,newData) VALUES (?, ?, ?, NOW(),?, ?)";
 
     try {
         // Vérifie si l'enregistrement existe
         $stmt = $mysqli->prepare($updateSql);
-        $stmt->bind_param("siis", $status, $objectToLog, $initiator, $newData);
+        $stmt->bind_param("siiss", $status, $objectToLog, $initiator, $oldData, $newData);
         $stmt->execute();
         $stmt->close();
 
         return true;
-    }
-    catch (\Throwable $th) {
+    } catch (\Throwable $th) {
         echo "Une erreur s'est produite : " . $th->getMessage();
         return false;
+    }
+}
+
+function deleteUser($userId)
+{
+    global $mysqli;
+
+    // Requête pour supprimer l'utilisateur avec l'ID donné
+    $deleteSql = "DELETE FROM users WHERE id = ?";
+
+    try {
+        // Préparer la requête
+        $stmt = $mysqli->prepare($deleteSql);
+
+        // Lier le paramètre de l'ID de l'utilisateur
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->close();
+        return true; // La suppression a réussi
+
+    } catch (\Throwable $th) {
+        echo "Une erreur s'est produite : " . $th->getMessage();
+        return false; // La suppression a échoué en raison d'une erreur
     }
 }

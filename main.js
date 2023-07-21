@@ -1,3 +1,5 @@
+import HistoryResellers from "./history";
+
 const gridOptions = {
   columnDefs: [
     { field: "id", filter: "agTextColumnFilter" },
@@ -42,11 +44,43 @@ const gridOptions = {
     resizable: true,
   },
   sideBar: true,
+  // Configuration du contextMenu personnalisé
+  getContextMenuItems: (params) => {
+    var customMenuItems = [
+      {
+        name: "History",
+        action: async () => {
+          const selectedRow = params.node.data;
+
+          fetch(`backend.php?page=logs&id=${selectedRow.id}&modeUser=false`)
+            .then((response) => response.json())
+            .then((data) => {
+              console.debug(data);
+              if (data.logs.length > 0) {
+                const history = new HistoryResellers(data.logs);
+                history.createGrid();
+              } else {
+                createNotification("No history");
+              }
+            });
+        },
+      },
+    ];
+
+    // Récupérer les éléments du menu par défaut d'Ag-Grid
+    var defaultItems = params.defaultItems;
+
+    // Combinez les éléments du menu personnalisés avec les éléments par défaut
+    var allMenuItems = customMenuItems.concat("separator", defaultItems);
+
+    return allMenuItems;
+  },
 };
 
 var category = {};
 var list_modified_row = [];
 var statusCat = [];
+const role = JSON.parse(getCookie("authToken")).role;
 
 /**
  * Fonction exécutée lorsque le DOM est chargé.
@@ -58,10 +92,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // Créer une instance de la grille avec les options spécifiées
   new agGrid.Grid(gridDiv, gridOptions);
 
+  createLogoutButton();
+
+  helloRole(role);
+
+  if (role === 3) createSettingsButton();
   // Récupérer les données à partir du backend
   fetch("backend.php?page=index")
     .then((response) => response.json())
     .then((data) => {
+      console.debug(data);
       // Stocker les catégories dans une variable globale
       category = data.category;
 
@@ -73,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
       autoSizeAll();
       gridOptions.api.closeToolPanel();
 
-      // Créer le bouton de gestion
+      // Créer le bouton de gestion des clients
       createManagementButton();
     })
     .catch((error) => {
@@ -81,12 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
       createNotification(
         `Erreur lors de l'envoi des données au backend: ${error}`
       );
-
-      // Afficher l'erreur dans le DOM
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 
   /**
@@ -121,13 +156,12 @@ document.addEventListener("DOMContentLoaded", function () {
         list_modified_row.length >= 1 &&
         !document.getElementById("bouttonSave")
       ) {
-        createSaveButton();
+        if (role === 2 || role === 3) createSaveButton();
       } else if (
         list_modified_row.length <= 0 &&
         document.getElementById("bouttonSave")
       ) {
-        const button = document.getElementById("bouttonSave");
-        button.parentNode.removeChild(button);
+        removeButton("bouttonSave");
       }
     } else if (event.column.getColId() === "status_cat") {
       const modifiedData = reassignationIdStatus(event.data);
@@ -173,11 +207,19 @@ function createSaveButton() {
   saveButton.textContent = "Save Changes";
   saveButton.style.padding = "10px";
   saveButton.style.margin = "5px";
-  saveButton.style.backgroundColor = "#007bff";
+  saveButton.style.backgroundColor = "#62F500";
   saveButton.style.color = "#fff";
   saveButton.style.border = "none";
   saveButton.style.borderRadius = "5px";
   saveButton.style.cursor = "pointer";
+
+  saveButton.addEventListener("mouseover", function () {
+    saveButton.style.backgroundColor = "#41A300";
+  });
+
+  saveButton.addEventListener("mouseout", function () {
+    saveButton.style.backgroundColor = "#62F500";
+  });
 
   saveButton.addEventListener("click", function () {
     saveChangesToBackend();
@@ -196,11 +238,19 @@ function createManagementButton() {
   managementButton.textContent = "Go to Management Page";
   managementButton.style.padding = "10px";
   managementButton.style.margin = "5px";
-  managementButton.style.backgroundColor = "#49a1ff";
+  managementButton.style.backgroundColor = "#007bff";
   managementButton.style.color = "#fff";
   managementButton.style.border = "none";
   managementButton.style.borderRadius = "5px";
   managementButton.style.cursor = "pointer";
+
+  managementButton.addEventListener("mouseover", function () {
+    managementButton.style.backgroundColor = "#004FA3";
+  });
+
+  managementButton.addEventListener("mouseout", function () {
+    managementButton.style.backgroundColor = "#007bff";
+  });
 
   managementButton.addEventListener("click", function () {
     load_manually_reseller_category();
@@ -210,6 +260,37 @@ function createManagementButton() {
   });
 
   buttonArea.appendChild(managementButton);
+}
+
+/**
+ * Crée un bouton "Settings" et l'ajoute au document.
+ */
+function createSettingsButton() {
+  const buttonArea = document.getElementById("buttonArea");
+  const createSettingsButton = document.createElement("button");
+  createSettingsButton.id = "bouttonSettings";
+  createSettingsButton.textContent = "Settings";
+  createSettingsButton.style.padding = "10px";
+  createSettingsButton.style.margin = "5px";
+  createSettingsButton.style.backgroundColor = "#B1B1B1";
+  createSettingsButton.style.color = "#fff";
+  createSettingsButton.style.border = "none";
+  createSettingsButton.style.borderRadius = "5px";
+  createSettingsButton.style.cursor = "pointer";
+
+  createSettingsButton.addEventListener("mouseover", function () {
+    createSettingsButton.style.backgroundColor = "#6E6E6E";
+  });
+
+  createSettingsButton.addEventListener("mouseout", function () {
+    createSettingsButton.style.backgroundColor = "#B1B1B1";
+  });
+
+  createSettingsButton.addEventListener("click", function () {
+    document.location.pathname = "userpage.php";
+  });
+
+  buttonArea.appendChild(createSettingsButton);
 }
 /**
  * Crée un bouton "Go to Set Category" et l'ajoute au document.
@@ -221,11 +302,19 @@ function createResetPageButton() {
   resetButton.textContent = "Go to Set Category";
   resetButton.style.padding = "10px";
   resetButton.style.margin = "5px";
-  resetButton.style.backgroundColor = "#49a1ff";
+  resetButton.style.backgroundColor = "#007bff";
   resetButton.style.color = "#fff";
   resetButton.style.border = "none";
   resetButton.style.borderRadius = "5px";
   resetButton.style.cursor = "pointer";
+
+  resetButton.addEventListener("mouseover", function () {
+    resetButton.style.backgroundColor = "#004FA3";
+  });
+
+  resetButton.addEventListener("mouseout", function () {
+    resetButton.style.backgroundColor = "#007bff";
+  });
 
   resetButton.addEventListener("click", function () {
     location.reload(); // Recharge la page pour réinitialiser son état par défaut
@@ -233,7 +322,48 @@ function createResetPageButton() {
 
   buttonArea.appendChild(resetButton);
 }
+/**
+ * Crée un bouton "Logout" et l'ajoute au document.
+ */
+function createLogoutButton() {
+  const buttonArea = document.getElementById("buttonArea");
+  const logoutButton = document.createElement("button");
+  logoutButton.id = "buttonLogout";
+  logoutButton.textContent = "Logout";
+  logoutButton.style.padding = "10px";
+  logoutButton.style.margin = "5px";
+  logoutButton.style.backgroundColor = "#FF5858";
+  logoutButton.style.color = "#fff";
+  logoutButton.style.border = "none";
+  logoutButton.style.borderRadius = "5px";
+  logoutButton.style.cursor = "pointer";
 
+  logoutButton.addEventListener("mouseover", function () {
+    logoutButton.style.backgroundColor = "#CC0000";
+  });
+
+  logoutButton.addEventListener("mouseout", function () {
+    logoutButton.style.backgroundColor = "#FF5858";
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    await logout();
+  });
+
+  buttonArea.appendChild(logoutButton);
+}
+
+async function logout() {
+  try {
+    const logout = await fetch("backend.php?page=logout");
+    createNotification(logout ? "Successful logout" : "Failed logout");
+    document.location.pathname = "/auth/login.php";
+  } catch (error) {
+    console.error(error);
+    createNotification(error);
+    document.location.pathname = "/auth/login.php";
+  }
+}
 /**
  * Redimensionne automatiquement toutes les colonnes de la grille.
  * @param {boolean} [skipHeader=false] - Indique si l'en-tête doit être exclu du redimensionnement.
@@ -248,28 +378,31 @@ function autoSizeAll(skipHeader) {
 }
 
 /**
- * Met à jour les catégories des données en utilisant les informations fournies.
- * @param {Object} data - Les données contenant les catégories et les données à mettre à jour.
+ * Met à jour les catégories des données en utilisant les informations de la variable `data`.
+ *
+ * @param {object} data - Les données contenant les catégories et les données à mettre à jour.
  */
 function setCategory(data) {
   const categories = data.category;
   const data_tmp = data.data;
 
-  try {
-    // Parcourir chaque élément dans les données
-    data_tmp.forEach((el) => {
-      if (el.id_cat_automatica !== null) {
-        // Mettre à jour le titre et l'ID de catégorie en utilisant la correspondance de l'ID
-        el.title_cat = categories.find((cat) => cat.id === el.id_cat).title;
-        el.id_cat = categories.find((cat) => cat.id === el.id_cat).id;
-      } else if (el.id_cat !== null) {
-        // Mettre à jour uniquement le titre de catégorie en utilisant la correspondance de l'ID
-        el.title_cat = categories.find((cat) => cat.id === el.id_cat).title;
-      }
-    });
-  } catch (error) {
-    console.error(error);
-  }
+  // Parcours des données à mettre à jour
+  data_tmp.forEach((el) => {
+    // Vérification de la catégorie automatique
+    if (el.id_cat_automatica !== null) {
+      // Mise à jour du titre de catégorie et de l'ID de catégorie
+      el.title_cat = categories.find(
+        (cat) => cat.id === el.id_cat_automatica
+      ).title;
+      el.id_cat = categories.find((cat) => cat.id === el.id_cat_automatica).id;
+    } else if (el.id_cat !== null) {
+      // Mise à jour du titre de catégorie
+      el.title_cat = categories.find((cat) => cat.id === el.id_cat).title;
+    } else {
+      // Aucune catégorie correspondante, titre vide
+      el.title_cat = "";
+    }
+  });
 }
 
 /**
@@ -323,37 +456,28 @@ function setStatus(data) {
 /**
  * Envoie les modifications au backend pour sauvegarde.
  */
-function saveChangesToBackend() {
+async function saveChangesToBackend() {
   var data_tmp = list_modified_row;
-  let php_user = getCookie("PHP_USER");
-  if (php_user === null) {
-    createNotification(`Please log in!`);
-    document.cookie = "";
-    document.location.reload();
-    return false;
-  }
   fetch("backend.php?page=index", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ modifiedData: data_tmp, initiator: php_user }),
+    body: JSON.stringify({ modifiedData: data_tmp }),
   })
     .then((response) => response.json())
     .then((result) => {
       list_modified_row = [];
       result.messages.map((el) => createNotification(el.message));
       majDataFront("index");
+      removeButton("bouttonSave");
     })
     .catch((error) => {
       console.error("Erreur lors de l'envoi des données au backend:", error);
       createNotification(
         `Erreur lors de l'envoi des données au backend: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 
@@ -361,38 +485,28 @@ function saveChangesToBackend() {
  * Envoie les modifications automatiquement au backend pour sauvegarde.
  * @param {Object} data - Les données modifiées à envoyer.
  */
-function saveChangesToBackendAuto(data) {
-  console.log(data);
-  let php_user = getCookie("PHP_USER");
-  if (php_user === null) {
-    createNotification(`Please log in!`);
-    document.cookie = "";
-    document.location.reload();
-    return false;
-  }
-  fetch("backend.php?page=management", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ modifiedData: data, initiator: php_user }),
-  })
-    .then((response) => response.json())
-    .then((result) => {
-      console.debug(result); // Affiche la réponse du backend
-      result.messages.map((el) => createNotification(el.message));
-      //majDataFront("management");
+async function saveChangesToBackendAuto(data) {
+  if (role === 2 || role === 3)
+    fetch("backend.php?page=management", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ modifiedData: data }),
     })
-    .catch((error) => {
-      console.error("Erreur lors de l'envoi des données au backend:", error);
-      createNotification(
-        `Erreur lors de l'envoi des données au backend: ${error}`
-      );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
-    });
+      .then((response) => response.json())
+      .then((result) => {
+        console.debug(result); // Affiche la réponse du backend
+        result.messages.map((el) => createNotification(el.message));
+        //majDataFront("management");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'envoi des données au backend:", error);
+        createNotification(
+          `Erreur lors de l'envoi des données au backend: ${error}`
+        );
+        document.location.pathname = "/auth/login.php";
+      });
 }
 
 /**
@@ -429,10 +543,7 @@ function majDataFront(mode) {
       createNotification(
         `Erreur lors de la récupération des données: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 
@@ -491,6 +602,7 @@ function load_manually_reseller_category() {
   fetch("backend.php?page=management")
     .then((response) => response.json())
     .then((data) => {
+      console.debug(data);
       // Désactive l'édition de la colonne "title_cat"
       editColumnProperties("title_cat", {
         editable: false,
@@ -509,16 +621,16 @@ function load_manually_reseller_category() {
         cellStyle: function getStatusCellStyle(params) {
           const status = params.value;
 
-          if (status === "open") {
-            return { backgroundColor: "lightgreen", color: "black" };
-          } else if (status === "working") {
-            return { backgroundColor: "orange", color: "black" };
-          } else if (status === "completed") {
-            return { backgroundColor: "lightgray", color: "black" };
+          switch (status) {
+            case "open":
+              return { backgroundColor: "lightgreen", color: "black" };
+            case "working":
+              return { backgroundColor: "orange", color: "black" };
+            case "completed":
+              return { backgroundColor: "lightgray", color: "black" };
+            default:
+              return null; // Valeur par défaut si aucune condition n'est satisfaite
           }
-
-          // Style par défaut pour les autres valeurs
-          return null;
         },
       });
 
@@ -551,10 +663,7 @@ function load_manually_reseller_category() {
       createNotification(
         `Erreur lors de la récupération des données: ${error}`
       );
-      const body = document.querySelector("body");
-      const out = document.createElement("div");
-      out.innerHTML = error;
-      body.appendChild(out);
+      document.location.pathname = "/auth/login.php";
     });
 }
 
@@ -633,19 +742,37 @@ function removeButton(id) {
   }
 }
 
-function getCookie(name) {
-  var cookies = document.cookie.split(";");
+function getCookie(cookieName) {
+  const name = cookieName + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(";");
 
-  for (var i = 0; i < cookies.length; i++) {
-    var cookie = cookies[i].trim();
-
-    // Vérifier si le nom du cookie correspond à celui recherché
-    if (cookie.indexOf(name + "=") === 0) {
-      // Extraire la valeur du cookie
-      return cookie.substring(name.length + 1);
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === " ") {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(name) === 0) {
+      return cookie.substring(name.length, cookie.length);
     }
   }
+  return null; // Return null if the cookie with the given name is not found
+}
 
-  // Retourner null si le cookie n'est pas trouvé
-  return null;
+function helloRole(role) {
+  const textRole = () => {
+    console.debug("Account role : ", role);
+    switch (role) {
+      case 1:
+        return "Read-only account";
+      case 2:
+        return "Read/write account";
+      case 3:
+        return "Admin account";
+      default:
+        return "Unknown role";
+    }
+  };
+
+  createNotification(textRole());
 }

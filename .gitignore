@@ -133,3 +133,4 @@ dist
 package*
 *.ts
 src/
+.vscode

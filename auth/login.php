@@ -2,26 +2,53 @@
 <html>
 
 <head>
-  <title>Authentification</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM Flazio</title>
+  <link rel="stylesheet" href="../style.css">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
 </head>
 
 <body>
-  <h2>Authentification</h2>
-  <form method="POST" action="login.php">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br>
+  <div id="page_login">
+    <div class="box_user_management">
+      <h1 class="title_box">Connection</h1>
+      <div class="box_user_management_content box_user_management_login">
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
-    <input type="submit" value="Login">
-    <a href="registration.php">Registration</a>
-  </form>
+        <form method="POST" action="login.php">
+
+          <div class="space"></div>
+          <input placeholder="Username" class="input" name="username" type="text" required autocomplete="username">
+          <div class="space"></div>
+          <input placeholder="Password" class="input" name="password" type="password" required
+            autocomplete="current-password">
+          <div class="space"></div>
+          <input id="button_submit" class="button_white" type="submit" name="button_submit" value="Login">
+        </form>
+
+      </div>
+    </div>
+
+
+  </div>
+
+
+  <footer>
+    <p id="footer_contact">
+      In case of any issues, contact the administrator <a id="a_footer_contact"
+        href="mailto:example@flazio.com">here</a> .
+    </p>
+  </footer>
 </body>
 
 </html>
 
 <?php
-require_once '../backend/db.php';
+require_once '../backend/auth.php';
 
 session_start();
 
@@ -29,46 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Récupérer les données du formulaire de connexion
   $username = $_POST['username'];
   $password = $_POST['password'];
-
-  // Vérifier si la connexion à la base de données est établie
-  if (isset($mysqli) && $mysqli instanceof mysqli) {
-    // Appeler la fonction pour obtenir les informations de l'utilisateur
-    $result = db\get_username($username);
-
-    // Vérifier si l'utilisateur existe dans la base de données
-    if ($result && $result->num_rows == 1) {
-      $row = $result->fetch_assoc();
-      $hashedPasswordFromDB = $row['password'];
-
-      // Vérifier si le mot de passe fourni correspond au hachage stocké
-      if (password_verify($password, $hashedPasswordFromDB)) {
-        // Authentification réussie
-        $_SESSION['authenticated'] = true;
-
-        // Récupération de l'ID de l'utilisateur depuis la base de données
-        $userId = $row['id'];
-        // Stockage de l'ID de l'utilisateur dans un cookie distinct
-        $idCookieName = "PHP_USER";
-        $idCookieValue = $userId;
-        $idExpiration = time() + (24 * 60 * 60);
-        setcookie($idCookieName, $idCookieValue, $idExpiration, '/');
-
-        header('Location: ../index.php');
-        exit;
-      }
-      else {
-        // Mot de passe incorrect
-        echo 'Mot de passe incorrect.';
-      }
-    }
-    else {
-      // Nom d'utilisateur incorrect
-      echo 'Nom d\'utilisateur incorrect.';
-    }
-  }
-  else {
-    // Erreur de connexion à la base de données
-    echo 'Erreur de connexion à la base de données.';
-  }
+  \auth\login($username, $password);
 }
 ?>
