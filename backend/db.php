@@ -198,15 +198,20 @@ function get_username($username)
  * @param string $hashedPassword Le mot de passe haché à insérer.
  * @return bool Retourne true si l'insertion a réussi, sinon false.
  */
-function set_register($username, $hashedPassword)
+function set_register($username, $hashedPassword, $role)
 {
     global $mysqli;
 
-    $query = "INSERT INTO users (username, password) VALUES (?, ?)";
+    $query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
 
     try {
         $stmt = $mysqli->prepare($query);
-        $stmt->bind_param("ss", $username, $hashedPassword);
+        $stmt->bind_param(
+            "sss",
+            $username,
+            $hashedPassword,
+            $role
+        );
         $stmt->execute();
         $stmt->close();
         return true;

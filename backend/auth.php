@@ -131,7 +131,7 @@ function checkLogin($exclude = 0)
             if (!is_array($exclude)) {
                 $exclude = array($exclude);
             }
-            $count = count(array_intersect($exclude, $roleUser));
+
             // Vérifier si le rôle de l'utilisateur est autorisé en fonction de $exclude
             if (count(array_intersect($exclude, $roleUser)) === 0) {
                 // Actualiser le jeton d'authentification dans la base de données
@@ -247,16 +247,17 @@ function modifiedPassword($userId, $password)
 
 function modifiedRole($userId, $role)
 {
+    \log\set_log_user('modifiedUsername', $userId, 'role', array("role" => $role));
     return \db\modifiedRole($userId, $role);
 }
 
-function registerUser($username, $password)
+function registerUser($username, $password, $role)
 {
     // Chiffrer le mot de passe
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
     // Appeler la fonction pour enregistrer l'utilisateur dans la base de données
-    return \db\set_register($username, $hashedPassword);
+    return \db\set_register($username, $hashedPassword, $role);
 }
 
 function deleteUser($userId)
@@ -272,10 +273,12 @@ function editAccount($userId, $username, $password, $role)
             array_push($result, array("message" => "Username", "status" => modifiedUsername($userId, $username)));
         }
         if ($password) {
-            array_push($result, array("message" => "Password", "status" => modifiedPassword($userId, $password)));;
+            array_push($result, array("message" => "Password", "status" => modifiedPassword($userId, $password)));
+            ;
         }
         if ($role) {
-            array_push($result, array("message" => "Role", "status" => modifiedRole($userId, $role)));;
+            array_push($result, array("message" => "Role", "status" => modifiedRole($userId, $role)));
+            ;
         }
         return json_encode($result);
     } else {
