@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 20, 2023 at 03:34 PM
+-- Generation Time: Jul 21, 2023 at 03:53 AM
 -- Server version: 8.0.31
 -- PHP Version: 8.2.8
 
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   PRIMARY KEY (`id`),
   KEY `initiator` (`initiator`),
   KEY `objectToLog` (`objectToLog`)
-) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `maps_info` (
   KEY `fk_lead` (`fk_lead`) USING BTREE,
   KEY `id_cat` (`id_cat`,`id_cat_automatica`),
   KEY `id_cat_automatica` (`id_cat_automatica`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -158,17 +158,17 @@ CREATE TABLE IF NOT EXISTS `reseller_experience_customer` (
 INSERT INTO `reseller_experience_customer` (`id`, `AccountID`, `TaxRegID`, `Nome`, `Cognome`, `RagioneSociale`, `Email`, `Indirizzo`, `Comune`, `CAP`, `Provincia`, `Tel`, `NumMobile`, `NumPagineDaAttivare`, `NumPagineAttivate`, `status`, `create_dt`, `update_dt`, `readed`, `reseller_experience_manager_id`, `CAOName`, `lead_status_cat`) VALUES
 (114080, '2614336', '', 'CLAUDIO RICCARDO', 'STAICU', 'STUDIO COPIA & PARTNERS SRL', '---', 'VIA PASUBIO 10', 'SAN BENEDETTO DEL TRONTO', '63039', 'AP', '----', '----', 5, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114081, '1240926', '0000000013680285', 'LAROSI', 'LAROSI', 'LAROSI S.A.S. DI LAROSI PIO & C.', '---', 'VIA MARONCELLI 105/B', 'PADOVA', '35129', 'PD', '----', '----', 3, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
-(114083, '2541820', '0000000044290625', 'PERLINGIERI', 'ALESSANDRO', 'SOCIETA\'\' OLEARIA INDUSTRIE AFFINI SRL S.O.I.A.', '---', 'VIA SCALO FERROVIARIO 66.', 'SOLOPACA', '82036', 'BN', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 2),
-(114084, '1013734', '0000000057960569', 'ALFREDO', 'ANTONUZZI', 'SOC. AGR. CANTINA OLEIFICIO SOCIALE DI GRADOLI', '---', 'VIA ROMA 31', 'GRADOLI', '01010', 'VT', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 2),
-(114085, '1009283', '0000000059250126', 'ALESSANDRO', 'CACCARO', 'IMPRESA EDILE CACCARO DI CACCARO GIULIANO & C. S.R', '---', 'VIA PASTRENGO N. 12', 'SOMMA LOMBARDO', '21019', 'VA', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 2),
+(114083, '2541820', '0000000044290625', 'PERLINGIERI', 'ALESSANDRO', 'SOCIETA\'\' OLEARIA INDUSTRIE AFFINI SRL S.O.I.A.', '---', 'VIA SCALO FERROVIARIO 66.', 'SOLOPACA', '82036', 'BN', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
+(114084, '1013734', '0000000057960569', 'ALFREDO', 'ANTONUZZI', 'SOC. AGR. CANTINA OLEIFICIO SOCIALE DI GRADOLI', '---', 'VIA ROMA 31', 'GRADOLI', '01010', 'VT', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
+(114085, '1009283', '0000000059250126', 'ALESSANDRO', 'CACCARO', 'IMPRESA EDILE CACCARO DI CACCARO GIULIANO & C. S.R', '---', 'VIA PASTRENGO N. 12', 'SOMMA LOMBARDO', '21019', 'VA', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114086, '2287794', '0000000062360565', 'ANDREA', 'ROCCHI', 'GIOACCHINI SANTE SAS DI ANDREA GIOACCHINI', '---', 'VIA VITTORIO VENETO 108', 'GROTTE DI CASTRO', '01025', 'VT', '----', '----', 4, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114087, '1210706', '0000000063150817', 'CARLO', 'MONTALTO', 'BAGLIO CURATOLO ARINI 1875 SOCIETA\'\' A RESPONSABIL', '---', 'VIA VITO CURATOLO ARINI, 5', 'MARSALA', '91025', 'TP', '----', '----', 8, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
-(114088, '2374583', '0000000069150282', 'LINO', 'IMPLATINI', 'ACIPADOVA SERVIZI SRL - UNIPERSONALE', '---', 'VIA SCROVEGNI 21', 'PADOVA', '35121', 'PD', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 2),
+(114088, '2374583', '0000000069150282', 'LINO', 'IMPLATINI', 'ACIPADOVA SERVIZI SRL - UNIPERSONALE', '---', 'VIA SCROVEGNI 21', 'PADOVA', '35121', 'PD', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114089, '2122468', '0000000069800399', 'CHIARA', 'GHINASSI', 'VETRERIA LANDI S.R.L.', '---', 'VIA POREC 100', 'MASSA LOMBARDA', '48024', 'RA', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114090, '2173677', '0000000078360674', 'MARCO', 'DI SABATINO', 'CONGLOMERATI BITUMINOSI VOMANO DI DI SABATINO OSCA', '---', 'VIA CESI SNC', 'PENNA SANT\'\'ANDREA', '64039', 'TE', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
-(114091, '1605499', '0000000081720526', 'SIMONE', 'MAFFEI', 'MAFFEI DI MAFFEI GIUSEPPE E C. S.N.C.', '---', 'VIA RINALDINI 7/9', 'SIENA', '53100', 'SI', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 3),
+(114091, '1605499', '0000000081720526', 'SIMONE', 'MAFFEI', 'MAFFEI DI MAFFEI GIUSEPPE E C. S.N.C.', '---', 'VIA RINALDINI 7/9', 'SIENA', '53100', 'SI', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114092, '1020918', '0000000089430532', 'GIANNA', 'BELLUMORI', 'BELLUMORI E CANINI SNC DI BELLUMORI GIANNA E C.', '---', 'VIA  DEL DUOMO FRAZ SOVANA 27', 'SORANO', '58010', 'GR', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
-(114094, '2873663', '0000000091660431', 'STEFANO', 'SEVERINI', 'ELIO ROMAGNOLI ROMCAFFE\'\' - S.R.L.', '---', 'VIA FIORETTI 1 PIEDIRIPA', 'MACERATA', '62100', 'MC', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 2),
+(114094, '2873663', '0000000091660431', 'STEFANO', 'SEVERINI', 'ELIO ROMAGNOLI ROMCAFFE\'\' - S.R.L.', '---', 'VIA FIORETTI 1 PIEDIRIPA', 'MACERATA', '62100', 'MC', '----', '----', 2, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114095, '1336162', '0000000098210438', 'ILENIA', 'PONTONI.', 'PONTONI S.R.L.', '---', 'VIA ALDO MORO 50', 'CALDAROLA', '62020', 'MC', '----', '----', 3, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114096, '1987674', '0000000099030322', 'ANDREA', 'COSSOVEL.', 'SERINOVE S.R.L.', '---', 'VIA MARCONI 14', 'TRIESTE', '34133', 'TS', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
 (114097, '1771626', '0000000101490449', 'CLAUDIA', 'ALBANESI', 'CALTEM - SOCIETA\'\' A RESPONSABILITA\'\' LIMITATA', '---', 'VIA MEDIANA INFERIORE 23 - 63040 MALTIGNANO, AP', 'MALTIGNANO', '63040', 'AP', '----', '----', 1, 0, 0, '2023-06-07 09:04:41', '2023-06-07 09:04:41', 0, NULL, 2, 1),
@@ -4722,21 +4722,19 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` varchar(255) NOT NULL,
   `status` int NOT NULL DEFAULT '3' COMMENT '0:''connected'';\r\n1:''offline'';\r\n2:''actived'' When a user is created or reactivated, he can connect;\r\n3:''deactivated'' When a user is deactivated, he cannot connect;',
   `role` int NOT NULL DEFAULT '1' COMMENT '1 = readOnly\r\n2 = read/write\r\n3 = admin',
-  `lastconnection` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `lastconnection` datetime DEFAULT NULL,
   `token` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `token` (`token`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `status`, `role`, `lastconnection`, `token`) VALUES
-(35, 'a', '$2y$10$Z2OV4vBdHbsBbi/RjWVfXutdYWC941XvKR/nr1MPDNWkAd58J0QI.', 0, 3, '2023-07-20 15:33:34', '2b76a8a69be6c6fa50a5d99126157ee6e8f184be9a85e5aad4eb5402e36de6b2'),
-(37, 'c', '$2y$10$dakIqGjeJhgm9hunr5tyyuhT4vBHKAilp3SqWXDYWef6EQm97Lw8G', 1, 1, '2023-07-20 03:13:45', NULL),
-(38, 'b', '$2y$10$9Vapp6NaTVj5Qbulcqkm9ux3AS3/sqrA01SPIrv1lICPcNX02A03q', 1, 1, '2023-07-20 11:29:18', NULL);
+(1, 'admin', '$2y$10$Xi5yb142u52NX3DceYhOU.t2Rm8lHLazGjQR0hzXYyEdd6IRPQ/h6', 3, 3, NULL, NULL);
 
 --
 -- Constraints for dumped tables
