@@ -181,7 +181,6 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     <input class="button_white" type="submit" name="button_submit" value="Register">
                 </form>
                 <input id="homeButton" class="button_white" type="button" name="homeButton" value="Return to home">
-                <div class="space"></div>
                 <?php
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Get the data from the registration form
@@ -192,6 +191,7 @@ if (!isset($_SESSION['authenticated']) && auth\checkLogin()) {
                     echo auth\registerUser($username, $password) ? "<br>Successful registration" : "<br>Registration failed";
                 }
                 ?>
+                <div class="space"></div>
             </div>
         </div>
     </div>

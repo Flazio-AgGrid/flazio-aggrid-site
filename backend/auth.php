@@ -40,7 +40,7 @@ function get_alluserinfo()
 
             switch ($row['role']) {
                 case 1:
-                    $role = 'Read';
+                    $role = 'Read-Only';
                     break;
                 case 2:
                     $role = 'Read/Write';
